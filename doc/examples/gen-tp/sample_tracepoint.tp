@@ -1,0 +1,15 @@
+LTTNG_UST_TRACEPOINT_EVENT(
+	sample_tracepoint,
+	message, // C++ Style comment
+	LTTNG_UST_TP_ARGS(const char *, text),
+	LTTNG_UST_TP_FIELDS(
+		lttng_ust_field_string(message, text)
+		  )
+)
+/*
+ * Longer comments
+ */
+LTTNG_UST_TRACEPOINT_LOGLEVEL(
+	sample_tracepoint,
+	message,
+	LTTNG_UST_TRACEPOINT_LOGLEVEL_WARNING)

@@ -1,0 +1,181 @@
+Source: ust
+Priority: optional
+Maintainer: Jon Bernard <jbernard@debian.org>
+Uploaders: Michael Jeanson <mjeanson@debian.org>
+Build-Depends: debhelper-compat (= 12),
+  default-jdk <!nojava> | default-jdk-headless <!nojava>,
+  dh-python,
+  dpkg-dev (>= 1.16.1),
+  javahelper <!nojava>,
+  liblog4j1.2-java <!nojava>,
+  libnuma-dev,
+  liburcu-dev (>= 0.12~),
+  pkg-config,
+  python3-all,
+  python3-distutils,
+  texinfo,
+  uuid-dev
+Standards-Version: 4.6.0.1
+Rules-Requires-Root: no
+Section: libs
+Vcs-Git: https://salsa.debian.org/debian/ust.git
+Vcs-Browser: https://salsa.debian.org/debian/ust
+Homepage: https://lttng.org/
+
+Package: liblttng-ust-common1
+Architecture: linux-any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: LTTng 2.0 Userspace Tracer (common library)
+ The userspace tracer is designed to provide detailed information about
+ userspace activity. Like the kernel tracer, performance is the main goal.
+ Tracing does not require system calls or traps. UST instrumentation points may
+ be added in any userspace code including signal handlers and libraries.
+ .
+ This package contains the common library used by the tracing and control
+ libraries.
+
+Package: liblttng-ust1
+Architecture: linux-any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends},
+  liblttng-ust-common1 (= ${binary:Version}),
+  liblttng-ust-ctl5 (= ${binary:Version})
+Description: LTTng 2.0 Userspace Tracer (tracing libraries)
+ The userspace tracer is designed to provide detailed information about
+ userspace activity. Like the kernel tracer, performance is the main goal.
+ Tracing does not require system calls or traps. UST instrumentation points may
+ be added in any userspace code including signal handlers and libraries.
+ .
+ This package contains the actual userspace tracing library that must be linked
+ to the instrumented programs.
+
+Package: liblttng-ust-ctl5
+Architecture: linux-any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends},
+  liblttng-ust-common1 (= ${binary:Version})
+Description: LTTng 2.0 Userspace Tracer (trace control library)
+ The userspace tracer is designed to provide detailed information about
+ userspace activity. Like the kernel tracer, performance is the main goal.
+ Tracing does not require system calls or traps. UST instrumentation points may
+ be added in any userspace code including signal handlers and libraries.
+ .
+ This package contains a library to control tracing in other processes. Used by
+ lttng-tools.
+
+Package: liblttng-ust-dev
+Section: libdevel
+Architecture: linux-any
+Multi-Arch: same
+Depends: ${misc:Depends},
+  liblttng-ust1 (= ${binary:Version}), liblttng-ust-ctl5 (= ${binary:Version}),
+  liblttng-ust-python-agent1 (= ${binary:Version}), liburcu-dev (>= 0.12~),
+  uuid-dev
+Recommends: python3
+Description: LTTng 2.0 Userspace Tracer (development files)
+ The userspace tracer is designed to provide detailed information about
+ userspace activity. Like the kernel tracer, performance is the main goal.
+ Tracing does not require system calls or traps. UST instrumentation points may
+ be added in any userspace code including signal handlers and libraries.
+ .
+ This package contains the UST library development files necessary to compile
+ and link applications against liblttng-ust.
+
+Package: liblttng-ust-java
+Section: java
+Architecture: all
+Multi-Arch: foreign
+Build-Profiles: <!nojava>
+Depends: liblttng-ust-java-jni (<< ${source:Version}.1~),
+         liblttng-ust-java-jni (>= ${source:Version}),
+         ${java:Depends}, ${misc:Depends}
+Description: LTTng 2.0 Userspace Tracer (Java support library)
+ The userspace tracer is designed to provide detailed information about
+ userspace activity. Like the kernel tracer, performance is the main goal.
+ Tracing does not require system calls or traps. UST instrumentation points may
+ be added in any userspace code including signal handlers and libraries.
+ .
+ This package ships the Java side of the JNI interface, as a .jar that can be
+ imported directly in Java applications.
+
+Package: liblttng-ust-java-jni
+Section: java
+Architecture: linux-any
+Multi-Arch: same
+Build-Profiles: <!nojava>
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: liblttng-ust-java (= ${source:Version})
+Description: LTTng 2.0 Userspace Tracer (JNI interface)
+ The userspace tracer is designed to provide detailed information about
+ userspace activity. Like the kernel tracer, performance is the main goal.
+ Tracing does not require system calls or traps. UST instrumentation points may
+ be added in any userspace code including signal handlers and libraries.
+ .
+ This package contains the native side of the JNI interface for lttng-ust.
+
+Package: liblttng-ust-agent-java
+Section: java
+Architecture: all
+Multi-Arch: foreign
+Build-Profiles: <!nojava>
+Depends: liblttng-ust-agent-java-jni (<< ${source:Version}.1~),
+         liblttng-ust-agent-java-jni (>= ${source:Version}),
+         ${java:Depends}, ${misc:Depends}
+Description: LTTng 2.0 Userspace Tracer (Java agent library)
+ The userspace tracer is designed to provide detailed information about
+ userspace activity. Like the kernel tracer, performance is the main goal.
+ Tracing does not require system calls or traps. UST instrumentation points may
+ be added in any userspace code including signal handlers and libraries.
+ .
+ This package ships the Java agent with JUL and log4j support, as a .jar that
+ can be imported directly in Java applications.
+
+Package: liblttng-ust-agent-java-jni
+Section: java
+Architecture: linux-any
+Multi-Arch: same
+Build-Profiles: <!nojava>
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: liblttng-ust-java (= ${source:Version})
+Description: LTTng 2.0 Userspace Tracer (Java agent JNI interface)
+ The userspace tracer is designed to provide detailed information about
+ userspace activity. Like the kernel tracer, performance is the main goal.
+ Tracing does not require system calls or traps. UST instrumentation points may
+ be added in any userspace code including signal handlers and libraries.
+ .
+ This package contains the native side of the Java agent for lttng-ust.
+
+Package: liblttng-ust-python-agent1
+Architecture: linux-any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends},
+  liblttng-ust1 (= ${binary:Version})
+Description: LTTng 2.0 Userspace Tracer (Python agent native library)
+ The userspace tracer is designed to provide detailed information about
+ userspace activity. Like the kernel tracer, performance is the main goal.
+ Tracing does not require system calls or traps. UST instrumentation points may
+ be added in any userspace code including signal handlers and libraries.
+ .
+ This package contains a library used by the Python agents.
+
+Package: python3-lttngust
+Section: python
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}, ${python3:Depends},
+  liblttng-ust-python-agent1 (>= ${source:Version}),
+  liblttng-ust-python-agent1 (<< ${source:Version}.1~)
+Description: LTTng 2.0 Userspace Tracer (Python 3 UST agent)
+ The userspace tracer is designed to provide detailed information about
+ userspace activity. Like the kernel tracer, performance is the main goal.
+ Tracing does not require system calls or traps. UST instrumentation points may
+ be added in any userspace code including signal handlers and libraries.
+ .
+ This package contains the Python 3.x UST agent.

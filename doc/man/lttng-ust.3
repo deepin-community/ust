@@ -1,0 +1,2318 @@
+'\" t
+.\"     Title: lttng-ust
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 08/02/2021
+.\"    Manual: LTTng Manual
+.\"    Source: LTTng 2.13.0
+.\"  Language: English
+.\"
+.TH "LTTNG\-UST" "3" "08/02/2021" "LTTng 2\&.13\&.0" "LTTng Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+lttng-ust \- LTTng user space tracing
+.SH "SYNOPSIS"
+.sp
+.nf
+\fB#include <lttng/tracepoint\&.h>\fR
+.fi
+.sp
+.nf
+#define \fBLTTNG_UST_TP_ARGS\fR(\fIargs\fR\&...)
+#define \fBLTTNG_UST_TP_ENUM_VALUES\fR(\fIvalues\fR\&...)
+#define \fBLTTNG_UST_TP_FIELDS\fR(\fIfields\fR\&...)
+#define \fBLTTNG_UST_TRACEPOINT_ENUM\fR(\fIprov_name\fR, \fIenum_name\fR, \fImappings\fR)
+#define \fBLTTNG_UST_TRACEPOINT_EVENT\fR(\fIprov_name\fR, \fIt_name\fR, \fIargs\fR, \fIfields\fR)
+#define \fBLTTNG_UST_TRACEPOINT_EVENT_CLASS\fR(\fIcls_prov_name\fR, \fIcls_name\fR,
+                                         \fIargs\fR, \fIfields\fR)
+#define \fBLTTNG_UST_TRACEPOINT_EVENT_INSTANCE\fR(\fIcls_prov_name\fR, \fIcls_name\fR,
+                                            \fIinst_prov_name\fR, \fIt_name\fR, \fIargs\fR)
+#define \fBLTTNG_UST_TRACEPOINT_LOGLEVEL\fR(\fIprov_name\fR, \fIt_name\fR, \fIlevel\fR)
+#define \fBlttng_ust_do_tracepoint\fR(\fIprov_name\fR, \fIt_name\fR, \&...)
+#define \fBlttng_ust_field_array\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+#define \fBlttng_ust_field_array_nowrite\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+#define \fBlttng_ust_field_array_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+#define \fBlttng_ust_field_array_nowrite_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                          \fIcount\fR)
+#define \fBlttng_ust_field_array_network\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+#define \fBlttng_ust_field_array_network_nowrite\fR(\fIint_type\fR, \fIfield_name\fR,
+                                              \fIexpr\fR, \fIcount\fR)
+#define \fBlttng_ust_field_array_network_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                          \fIcount\fR)
+#define \fBlttng_ust_field_array_network_nowrite_hex\fR(\fIint_type\fR, \fIfield_name\fR,
+                                                  \fIexpr\fR, \fIcount\fR)
+#define \fBlttng_ust_field_array_text\fR(char, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+#define \fBlttng_ust_field_array_text_nowrite\fR(char, \fIfield_name\fR, \fIexpr\fR,
+                                           \fIcount\fR)
+#define \fBlttng_ust_field_enum\fR(\fIprov_name\fR, \fIenum_name\fR, \fIint_type\fR, \fIfield_name\fR,
+                             \fIexpr\fR)
+#define \fBlttng_ust_field_enum_nowrite\fR(\fIprov_name\fR, \fIenum_name\fR, \fIint_type\fR,
+                                     \fIfield_name\fR, \fIexpr\fR)
+#define \fBlttng_ust_field_enum_value\fR(\fIlabel\fR, \fIvalue\fR)
+#define \fBlttng_ust_field_enum_range\fR(\fIlabel\fR, \fIstart\fR, \fIend\fR)
+#define \fBlttng_ust_field_float\fR(\fIfloat_type\fR, \fIfield_name\fR, \fIexpr\fR)
+#define \fBlttng_ust_field_float_nowrite\fR(\fIfloat_type\fR, \fIfield_name\fR, \fIexpr\fR)
+#define \fBlttng_ust_field_integer\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR)
+#define \fBlttng_ust_field_integer_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR)
+#define \fBlttng_ust_field_integer_network\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR)
+#define \fBlttng_ust_field_integer_network_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR)
+#define \fBlttng_ust_field_integer_nowrite\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR)
+#define \fBlttng_ust_field_sequence\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                 \fIlen_type\fR, \fIlen_expr\fR)
+#define \fBlttng_ust_field_sequence_nowrite\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                         \fIlen_type\fR, \fIlen_expr\fR)
+#define \fBlttng_ust_field_sequence_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                     \fIlen_type\fR, \fIlen_expr\fR)
+#define \fBlttng_ust_field_sequence_nowrite_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                             \fIlen_type\fR, \fIlen_expr\fR)
+#define \fBlttng_ust_field_sequence_network\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                         \fIlen_type\fR, \fIlen_expr\fR)
+#define \fBlttng_ust_field_sequence_network_nowrite\fR(\fIint_type\fR, \fIfield_name\fR,
+                                                 \fIexpr\fR, \fIlen_type\fR,
+                                                 \fIlen_expr\fR)
+#define \fBlttng_ust_field_sequence_network_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                             \fIlen_type\fR, \fIlen_expr\fR)
+#define \fBlttng_ust_field_sequence_network_nowrite_hex\fR(\fIint_type\fR,
+                                                     \fIfield_name\fR,
+                                                     \fIexpr\fR, \fIlen_type\fR,
+                                                     \fIlen_expr\fR)
+#define \fBlttng_ust_field_sequence_text\fR(char, \fIfield_name\fR, \fIexpr\fR, \fIlen_type\fR,
+                                      \fIlen_expr\fR)
+#define \fBlttng_ust_field_sequence_text_nowrite\fR(char, \fIfield_name\fR, \fIexpr\fR,
+                                              \fIlen_type\fR, \fIlen_expr\fR)
+#define \fBlttng_ust_field_string\fR(\fIfield_name\fR, \fIexpr\fR)
+#define \fBlttng_ust_field_string_nowrite\fR(\fIfield_name\fR, \fIexpr\fR)
+#define \fBlttng_ust_tracepoint\fR(\fIprov_name\fR, \fIt_name\fR, \&...)
+#define \fBlttng_ust_tracepoint_enabled\fR(\fIprov_name\fR, \fIt_name\fR)
+.fi
+.sp
+Link with, following this manual page:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fB-llttng-ust -ldl\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+If you define
+\fB_LGPL_SOURCE\fR
+before including
+\fB<lttng/tracepoint.h>\fR
+(directly or indirectly):
+\fB-llttng-ust-common\fR
+.RE
+.SH "DESCRIPTION"
+.sp
+The \fILinux Trace Toolkit: next generation\fR <http://lttng.org/> is an open source software package used for correlated tracing of the Linux kernel, user applications, and user libraries\&.
+.sp
+LTTng\-UST is the user space tracing component of the LTTng project\&. It is a port to user space of the low\-overhead tracing capabilities of the LTTng Linux kernel tracer\&. The \fBliblttng-ust\fR library is used to trace user applications and libraries\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+This man page is about the \fBliblttng-ust\fR library\&. The LTTng\-UST project also provides Java and Python packages to trace applications written in those languages\&. How to instrument and trace Java and Python applications is documented in the online LTTng documentation <http://lttng.org/docs/>\&.
+.sp .5v
+.RE
+.sp
+There are three ways to use \fBliblttng-ust\fR:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Using the
+\fBlttng_ust_tracef\fR(3)
+API, which is similar to
+\fBprintf\fR(3)\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Using the
+\fBlttng_ust_tracelog\fR(3)
+API, which is
+\fBlttng_ust_tracef\fR(3)
+with a log level parameter\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Defining your own tracepoints\&. See the
+\fICreating a tracepoint provider\fR
+section below\&.
+.RE
+.SS "Compatibility with previous APIs"
+.sp
+Since LTTng\-UST\ \&2\&.13, the \fBLTTNG_UST_COMPAT_API_VERSION\fR definition controls which LTTng\-UST APIs are available (compiled):
+.PP
+Undefined
+.RS 4
+All APIs are available\&.
+.RE
+.PP
+\fIN\fR (0 or positive integer)
+.RS 4
+API version\ \&\fIN\fR, and all the following existing APIs, are available\&. Previous APIs are not available (not compiled)\&.
+.RE
+.sp
+The following table shows the mapping from LTTng\-UST versions (up to LTTng\-UST\ \&2\&.13\&.0) to available API versions:
+.TS
+allbox tab(:);
+ltB ltB.
+T{
+LTTng\-UST version
+T}:T{
+Available API versions
+T}
+.T&
+lt lt
+lt lt.
+T{
+.sp
+2\&.0 to 2\&.12
+T}:T{
+.sp
+0
+T}
+T{
+.sp
+2\&.13
+T}:T{
+.sp
+0 and 1
+T}
+.TE
+.sp 1
+.sp
+This manual page \fBonly\fR documents version\ \&1 of the API\&.
+.sp
+If you wish to have access to version\ \&0 of the API (for example, the \fBtracepoint()\fR, \fBctf_integer()\fR, and \fBTRACEPOINT_EVENT()\fR macros), then either don\(cqt define \fBLTTNG_UST_COMPAT_API_VERSION\fR, or define it to \fB0\fR before including any LTTng\-UST header\&.
+.SS "Creating a tracepoint provider"
+.sp
+Creating a tracepoint provider is the first step of using \fBliblttng-ust\fR\&. The next steps are:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fIInstrumenting your application with \fBlttng_ust_tracepoint()\fR calls\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Building your application with LTTng\-UST support, either
+\fIstatically\fR
+or
+\fIdynamically\fR\&.
+.RE
+.sp
+A \fBtracepoint provider\fR is a compiled object containing the event probes corresponding to your custom tracepoint definitions\&. A tracepoint provider contains the code to get the size of an event and to serialize it, amongst other things\&.
+.sp
+To create a tracepoint provider, start with the following \fItracepoint provider header\fR template:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#undef LTTNG_UST_TRACEPOINT_PROVIDER
+#define LTTNG_UST_TRACEPOINT_PROVIDER my_provider
+
+#undef LTTNG_UST_TRACEPOINT_INCLUDE
+#define LTTNG_UST_TRACEPOINT_INCLUDE "\&./tp\&.h"
+
+#if !defined(_TP_H) || \e
+    defined(LTTNG_UST_TRACEPOINT_HEADER_MULTI_READ)
+#define _TP_H
+
+#include <lttng/tracepoint\&.h>
+
+/*
+ * LTTNG_UST_TRACEPOINT_EVENT(), LTTNG_UST_TRACEPOINT_EVENT_CLASS(),
+ * LTTNG_UST_TRACEPOINT_EVENT_INSTANCE(),
+ * LTTNG_UST_TRACEPOINT_LOGLEVEL(), and `LTTNG_UST_TRACEPOINT_ENUM()`
+ * are used here\&.
+ */
+
+#endif /* _TP_H */
+
+#include <lttng/tracepoint\-event\&.h>
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+In this template, the tracepoint provider is named \fBmy_provider\fR (\fBLTTNG_UST_TRACEPOINT_PROVIDER\fR definition)\&. The file needs to bear the name of the \fBLTTNG_UST_TRACEPOINT_INCLUDE\fR definition (\fBtp.h\fR in this case)\&. Between \fB#include <lttng/tracepoint.h>\fR and \fB#endif\fR go the invocations of the \fI\fBLTTNG_UST_TRACEPOINT_EVENT()\fR\fR, \fI\fBLTTNG_UST_TRACEPOINT_EVENT_CLASS()\fR\fR, \fI\fBLTTNG_UST_TRACEPOINT_EVENT_INSTANCE()\fR\fR, \fI\fBLTTNG_UST_TRACEPOINT_LOGLEVEL()\fR\fR, and \fI\fBLTTNG_UST_TRACEPOINT_ENUM()\fR\fR macros\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+You can avoid writing the prologue and epilogue boilerplate in the template file above by using the \fBlttng-gen-tp\fR(1) tool shipped with LTTng\-UST\&.
+.sp .5v
+.RE
+.sp
+The tracepoint provider header file needs to be included in a source file which looks like this:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#define LTTNG_UST_TRACEPOINT_CREATE_PROBES
+
+#include "tp\&.h"
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Together, those two files (let\(cqs call them \fBtp.h\fR and \fBtp.c\fR) form the tracepoint provider sources, ready to be compiled\&.
+.sp
+You can create multiple tracepoint providers to be used in a single application, but each one must have its own header file\&.
+.sp
+The \fI\fBLTTNG_UST_TRACEPOINT_EVENT()\fR usage\fR section below shows how to use the \fBLTTNG_UST_TRACEPOINT_EVENT()\fR macro to define the actual tracepoints in the tracepoint provider header file\&.
+.sp
+See the \fIEXAMPLE\fR section below for a complete example\&.
+.SS "\fBLTTNG_UST_TRACEPOINT_EVENT()\fR usage"
+.sp
+The \fBLTTNG_UST_TRACEPOINT_EVENT()\fR macro is used in a template provider header file (see the \fICreating a tracepoint provider\fR section above) to define LTTng\-UST tracepoints\&.
+.sp
+The \fBLTTNG_UST_TRACEPOINT_EVENT()\fR usage template is as follows:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+LTTNG_UST_TRACEPOINT_EVENT(
+    /* Tracepoint provider name */
+    my_provider,
+
+    /* Tracepoint/event name */
+    my_tracepoint,
+
+    /* List of tracepoint arguments (input) */
+    LTTNG_UST_TP_ARGS(
+        \&.\&.\&.
+    ),
+
+    /* List of fields of eventual event (output) */
+    LTTNG_UST_TP_FIELDS(
+        \&.\&.\&.
+    )
+)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The \fBLTTNG_UST_TP_ARGS()\fR macro contains the input arguments of the tracepoint\&. Those arguments can be used in the argument expressions of the output fields defined in \fBLTTNG_UST_TP_FIELDS()\fR\&.
+.sp
+The format of the \fBLTTNG_UST_TP_ARGS()\fR parameters is: C type, then argument name; repeat as needed, up to ten times\&. For example:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+LTTNG_UST_TP_ARGS(
+    int, my_int,
+    const char *, my_string,
+    FILE *, my_file,
+    double, my_float,
+    struct my_data *, my_data
+)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The \fBLTTNG_UST_TP_FIELDS()\fR macro contains the output fields of the tracepoint, that is, the actual data that can be recorded in the payload of an event emitted by this tracepoint\&.
+.sp
+The \fBLTTNG_UST_TP_FIELDS()\fR macro contains a list of \fBlttng_ust_field_*()\fR macros NOT separated by commas\&. The available macros are documented in the \fIAvailable \fBlttng_ust_field_*()\fR field type macros\fR section below\&.
+.SS "Available field macros"
+.sp
+This section documents the available \fBlttng_ust_field_*()\fR macros that can be inserted in the \fBLTTNG_UST_TP_FIELDS()\fR macro of the \fI\fBLTTNG_UST_TRACEPOINT_EVENT()\fR macro\fR\&.
+.sp
+Standard integer, displayed in base 10:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_integer\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR)
+\fBlttng_ust_field_integer_nowrite\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Standard integer, displayed in base 16:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_integer_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Integer in network byte order (big endian), displayed in base 10:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_integer_network\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Integer in network byte order, displayed in base 16:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_integer_network_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Floating point number:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_float\fR(\fIfloat_type\fR, \fIfield_name\fR, \fIexpr\fR)
+\fBlttng_ust_field_float_nowrite\fR(\fIfloat_type\fR, \fIfield_name\fR, \fIexpr\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Null\-terminated string:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_string\fR(\fIfield_name\fR, \fIexpr\fR)
+\fBlttng_ust_field_string_nowrite\fR(\fIfield_name\fR, \fIexpr\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Statically\-sized array of integers (\fB_hex\fR versions displayed in hexadecimal, \fB_network\fR versions in network byte order):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_array\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+\fBlttng_ust_field_array_nowrite\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+\fBlttng_ust_field_array_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+\fBlttng_ust_field_array_nowrite_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+\fBlttng_ust_field_array_network\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+\fBlttng_ust_field_array_network_nowrite\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                      \fIcount\fR)
+\fBlttng_ust_field_array_network_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+\fBlttng_ust_field_array_network_nowrite_hex\fR(\fIint_type\fR, \fIfield_name\fR,
+                                          \fIexpr\fR, \fIcount\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Statically\-sized array, printed as text; no need to be null\-terminated:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_array_text\fR(char, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+\fBlttng_ust_field_array_text_nowrite\fR(char, \fIfield_name\fR, \fIexpr\fR, \fIcount\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Dynamically\-sized array of integers (\fB_hex\fR versions displayed in hexadecimal, \fB_network\fR versions in network byte order):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_sequence\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIlen_type\fR,
+                         \fIlen_expr\fR)
+\fBlttng_ust_field_sequence_nowrite\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                 \fIlen_type\fR, \fIlen_expr\fR)
+\fBlttng_ust_field_sequence_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR, \fIlen_type\fR,
+                             \fIlen_expr\fR)
+\fBlttng_ust_field_sequence_nowrite_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                     \fIlen_type\fR, \fIlen_expr\fR)
+\fBlttng_ust_field_sequence_network\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                 \fIlen_type\fR, \fIlen_expr\fR)
+\fBlttng_ust_field_sequence_network_nowrite\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                         \fIlen_type\fR, \fIlen_expr\fR)
+\fBlttng_ust_field_sequence_network_hex\fR(\fIint_type\fR, \fIfield_name\fR, \fIexpr\fR,
+                                     \fIlen_type\fR, \fIlen_expr\fR)
+\fBlttng_ust_field_sequence_network_nowrite_hex\fR(\fIint_type\fR, \fIfield_name\fR,
+                                             \fIexpr\fR, \fIlen_type\fR,
+                                             \fIlen_expr\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Dynamically\-sized array, displayed as text; no need to be null\-terminated:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_sequence_text\fR(char, \fIfield_name\fR, \fIexpr\fR, \fIlen_type\fR,
+                              \fIlen_expr\fR)
+\fBlttng_ust_field_sequence_text_nowrite\fR(char, \fIfield_name\fR, \fIexpr\fR,
+                                      \fIlen_type\fR, \fIlen_expr\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Enumeration\&. The enumeration field must be defined before using this macro with the \fBLTTNG_UST_TRACEPOINT_ENUM()\fR macro\&. See the \fI\fBLTTNG_UST_TRACEPOINT_ENUM()\fR usage\fR section for more information\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_enum\fR(\fIprov_name\fR, \fIenum_name\fR, \fIint_type\fR, \fIfield_name\fR,
+                     \fIexpr\fR)
+\fBlttng_ust_field_enum_nowrite\fR(\fIprov_name\fR, \fIenum_name\fR, \fIint_type\fR,
+                             \fIfield_name\fR, \fIexpr\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The parameters are:
+.PP
+\fIcount\fR
+.RS 4
+Number of elements in array/sequence\&. This must be known at compile time\&.
+.RE
+.PP
+\fIenum_name\fR
+.RS 4
+Name of an enumeration field previously defined with the
+\fBLTTNG_UST_TRACEPOINT_ENUM()\fR
+macro\&. See the
+\fI\fBLTTNG_UST_TRACEPOINT_ENUM()\fR usage\fR
+section for more information\&.
+.RE
+.PP
+\fIexpr\fR
+.RS 4
+C expression resulting in the field\(cqs value\&. This expression can use one or more arguments passed to the tracepoint\&. The arguments of a given tracepoint are defined in the
+\fBLTTNG_UST_TP_ARGS()\fR
+macro (see the
+\fICreating a tracepoint provider\fR
+section above)\&.
+.RE
+.PP
+\fIfield_name\fR
+.RS 4
+Event field name (C identifier syntax, NOT a literal string)\&.
+.RE
+.PP
+\fIfloat_type\fR
+.RS 4
+Float C type (\fBfloat\fR
+or
+\fBdouble\fR)\&. The size of this type determines the size of the floating point number field\&.
+.RE
+.PP
+\fIint_type\fR
+.RS 4
+Integer C type\&. The size of this type determines the size of the integer/enumeration field\&.
+.RE
+.PP
+\fIlen_expr\fR
+.RS 4
+C expression resulting in the sequence\(cqs length\&. This expression can use one or more arguments passed to the tracepoint\&.
+.RE
+.PP
+\fIlen_type\fR
+.RS 4
+Unsigned integer C type of sequence\(cqs length\&.
+.RE
+.PP
+\fIprov_name\fR
+.RS 4
+Tracepoint provider name\&. This must be the same as the tracepoint provider name used in a previous field definition\&.
+.RE
+.sp
+The \fB_nowrite\fR versions omit themselves from the recorded trace, but are otherwise identical\&. Their primary purpose is to make some of the event context available to the event filters without having to commit the data to sub\-buffers\&. See \fBlttng-enable-event\fR(1) to learn more about dynamic event filtering\&.
+.sp
+See the \fIEXAMPLE\fR section below for a complete example\&.
+.SS "\fBLTTNG_UST_TRACEPOINT_ENUM()\fR usage"
+.sp
+An enumeration field is a list of mappings between an integers, or a range of integers, and strings (sometimes called \fIlabels\fR or \fIenumerators\fR)\&. Enumeration fields can be used to have a more compact trace when the possible values for a field are limited\&.
+.sp
+An enumeration field is defined with the \fBLTTNG_UST_TRACEPOINT_ENUM()\fR macro:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+LTTNG_UST_TRACEPOINT_ENUM(
+    /* Tracepoint provider name */
+    my_provider,
+
+    /* Enumeration name (unique in the whole tracepoint provider) */
+    my_enum,
+
+    /* Enumeration mappings */
+    LTTNG_UST_TP_ENUM_VALUES(
+        \&.\&.\&.
+    )
+)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+\fBLTTNG_UST_TP_ENUM_VALUES()\fR contains a list of enumeration mappings, NOT separated by commas\&. Two macros can be used in the \fBLTTNG_UST_TP_ENUM_VALUES()\fR: \fBlttng_ust_field_enum_value()\fR and \fBlttng_ust_field_enum_range()\fR\&.
+.sp
+\fBlttng_ust_field_enum_value()\fR is a single value mapping:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_enum_value\fR(\fIlabel\fR, \fIvalue\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+This macro maps the given \fIlabel\fR string to the value \fIvalue\fR\&.
+.sp
+\fBlttng_ust_field_enum_range()\fR is a range mapping:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\fBlttng_ust_field_enum_range\fR(\fIlabel\fR, \fIstart\fR, \fIend\fR)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+This macro maps the given \fIlabel\fR string to the range of integers from \fIstart\fR to \fIend\fR, inclusively\&. Range mappings may overlap, but the behaviour is implementation\-defined: each trace reader handles overlapping ranges as it wishes\&.
+.sp
+See the \fIEXAMPLE\fR section below for a complete example\&.
+.SS "\fBLTTNG_UST_TRACEPOINT_EVENT_CLASS()\fR usage"
+.sp
+A \fBtracepoint class\fR is a class of tracepoints sharing the same field types and names\&. A tracepoint instance is one instance of such a declared tracepoint class, with its own event name\&.
+.sp
+LTTng\-UST creates one event serialization function per tracepoint class\&. Using \fBLTTNG_UST_TRACEPOINT_EVENT()\fR creates one tracepoint class per tracepoint definition, whereas using \fBLTTNG_UST_TRACEPOINT_EVENT_CLASS()\fR and \fBLTTNG_UST_TRACEPOINT_EVENT_INSTANCE()\fR creates one tracepoint class, and one or more tracepoint instances of this class\&. In other words, many tracepoints can reuse the same serialization code\&. Reusing the same code, when possible, can reduce cache pollution, thus improve performance\&.
+.sp
+The \fBLTTNG_UST_TRACEPOINT_EVENT_CLASS()\fR macro accepts the same parameters as the \fBLTTNG_UST_TRACEPOINT_EVENT()\fR macro, except that instead of an event name, its second parameter is the \fItracepoint class name\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#define LTTNG_UST_TRACEPOINT_PROVIDER my_provider
+
+/* \&.\&.\&. */
+
+LTTNG_UST_TRACEPOINT_EVENT_CLASS(
+    /* Tracepoint class provider name */
+    my_provider,
+
+    /* Tracepoint class name */
+    my_tracepoint_class,
+
+    /* List of tracepoint arguments (input) */
+    LTTNG_UST_TP_ARGS(
+        \&.\&.\&.
+    ),
+
+    /* List of fields of eventual event (output) */
+    LTTNG_UST_TP_FIELDS(
+        \&.\&.\&.
+    )
+)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Once the tracepoint class is defined, you can create as many tracepoint instances as needed:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#define LTTNG_UST_TRACEPOINT_PROVIDER natality
+
+/* \&.\&.\&. */
+
+LTTNG_UST_TRACEPOINT_EVENT_INSTANCE(
+    /* Name of the tracepoint class provider */
+    my_provider,
+
+    /* Tracepoint class name */
+    my_tracepoint_class,
+
+    /* Name of the local (instance) tracepoint provider */
+    natality,
+
+    /* Tracepoint/event name */
+    my_tracepoint,
+
+    /* List of tracepoint arguments (input) */
+    LTTNG_UST_TP_ARGS(
+        \&.\&.\&.
+    )
+)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+As you can see, the \fBLTTNG_UST_TRACEPOINT_EVENT_INSTANCE()\fR does not contain the \fBLTTNG_UST_TP_FIELDS()\fR macro, because they are defined at the \fBLTTNG_UST_TRACEPOINT_EVENT_CLASS()\fR level\&.
+.sp
+Note that the \fBLTTNG_UST_TRACEPOINT_EVENT_INSTANCE()\fR macro requires two provider names:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The name of the tracepoint class provider (\fBmy_provider\fR
+in the example above)\&.
+.sp
+This is the same as the first argument of the
+\fBLTTNG_UST_TRACEPOINT_EVENT_CLASS()\fR
+expansion to refer to\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The name of the local, or instance, provider (\fBnatality\fR
+in the example above)\&.
+.sp
+This is the provider name which becomes the prefix part of the name of the events which such a tracepoint creates\&.
+.RE
+.sp
+The two provider names may be different if the tracepoint class and the tracepoint instance macros are in two different translation units\&.
+.sp
+See the \fIEXAMPLE\fR section below for a complete example\&.
+.SS "\fBLTTNG_UST_TRACEPOINT_LOGLEVEL()\fR usage"
+.sp
+Optionally, a \fBlog level\fR can be assigned to a defined tracepoint\&. Assigning different levels of severity to tracepoints can be useful: when controlling tracing sessions, you can choose to only enable events falling into a specific log level range using the \fB--loglevel\fR and \fB--loglevel-only\fR options of the \fBlttng-enable-event\fR(1) command\&.
+.sp
+Log levels are assigned to tracepoints that are already defined using the \fBLTTNG_UST_TRACEPOINT_LOGLEVEL()\fR macro\&. The latter must be used after having used \fBLTTNG_UST_TRACEPOINT_EVENT()\fR or \fBLTTNG_UST_TRACEPOINT_EVENT_INSTANCE()\fR for a given tracepoint\&. The \fBLTTNG_UST_TRACEPOINT_LOGLEVEL()\fR macro is used as follows:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+LTTNG_UST_TRACEPOINT_LOGLEVEL(
+    /* Tracepoint provider name */
+    my_provider,
+
+    /* Tracepoint/event name */
+    my_tracepoint,
+
+    /* Log level */
+    LTTNG_UST_TRACEPOINT_LOGLEVEL_INFO
+)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The available log level definitions are:
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_EMERG\fR
+.RS 4
+System is unusable\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_ALERT\fR
+.RS 4
+Action must be taken immediately\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_CRIT\fR
+.RS 4
+Critical conditions\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_ERR\fR
+.RS 4
+Error conditions\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_WARNING\fR
+.RS 4
+Warning conditions\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_NOTICE\fR
+.RS 4
+Normal, but significant, condition\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_INFO\fR
+.RS 4
+Informational message\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_DEBUG_SYSTEM\fR
+.RS 4
+Debug information with system\-level scope (set of programs)\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_DEBUG_PROGRAM\fR
+.RS 4
+Debug information with program\-level scope (set of processes)\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_DEBUG_PROCESS\fR
+.RS 4
+Debug information with process\-level scope (set of modules)\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_DEBUG_MODULE\fR
+.RS 4
+Debug information with module (executable/library) scope (set of units)\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_DEBUG_UNIT\fR
+.RS 4
+Debug information with compilation unit scope (set of functions)\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_DEBUG_FUNCTION\fR
+.RS 4
+Debug information with function\-level scope\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_DEBUG_LINE\fR
+.RS 4
+Debug information with line\-level scope (default log level)\&.
+.RE
+.PP
+\fBLTTNG_UST_TRACEPOINT_LOGLEVEL_DEBUG\fR
+.RS 4
+Debug\-level message\&.
+.RE
+.sp
+See the \fIEXAMPLE\fR section below for a complete example\&.
+.SS "Instrumenting your application"
+.sp
+Once the tracepoint provider is created (see the \fICreating a tracepoint provider\fR section above), you can instrument your application with the defined tracepoints thanks to the \fBlttng_ust_tracepoint()\fR macro:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#define \fBlttng_ust_tracepoint\fR(\fIprov_name\fR, \fIt_name\fR, \&...)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+With:
+.PP
+\fIprov_name\fR
+.RS 4
+Tracepoint provider name\&.
+.RE
+.PP
+\fIt_name\fR
+.RS 4
+Tracepoint/event name\&.
+.RE
+.PP
+\fB...\fR
+.RS 4
+Tracepoint arguments, if any\&.
+.RE
+.sp
+Make sure to include the tracepoint provider header file anywhere you use \fBlttng_ust_tracepoint()\fR for this provider\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+Even though LTTng\-UST supports \fBlttng_ust_tracepoint()\fR call site duplicates having the same provider and tracepoint names, it is recommended to use a provider/tracepoint name pair only once within the application source code to help map events back to their call sites when analyzing the trace\&.
+.sp .5v
+.RE
+.sp
+Sometimes, arguments to the tracepoint are expensive to compute (take call stack, for example)\&. To avoid the computation when the tracepoint is disabled, you can use the \fBlttng_ust_tracepoint_enabled()\fR and \fBlttng_ust_do_tracepoint()\fR macros:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#define \fBlttng_ust_tracepoint_enabled\fR(\fIprov_name\fR, \fIt_name\fR)
+#define \fBlttng_ust_do_tracepoint\fR(\fIprov_name\fR, \fIt_name\fR, \&...)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+\fBlttng_ust_tracepoint_enabled()\fR returns a non\-zero value if the tracepoint named \fIt_name\fR from the provider named \fIprov_name\fR is enabled at run time\&.
+.sp
+\fBlttng_ust_do_tracepoint()\fR is like \fBlttng_ust_tracepoint()\fR, except that it doesn\(cqt check if the tracepoint is enabled\&. Using \fBlttng_ust_tracepoint()\fR with \fBlttng_ust_tracepoint_enabled()\fR is dangerous since \fBlttng_ust_tracepoint()\fR also contains the \fBlttng_ust_tracepoint_enabled()\fR check, thus a race condition is possible in this situation:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+if (lttng_ust_tracepoint_enabled(my_provider, my_tracepoint)) {
+    stuff = prepare_stuff();
+}
+
+lttng_ust_tracepoint(my_provider, my_tracepoint, stuff);
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+If the tracepoint is enabled after the condition, then \fBstuff\fR is not prepared: the emitted event will either contain wrong data, or the whole application could crash (segmentation fault, for example)\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+Neither \fBlttng_ust_tracepoint_enabled()\fR nor \fBlttng_ust_do_tracepoint()\fR have a \fBSTAP_PROBEV()\fR call, so if you need it, you should emit this call yourself\&.
+.sp .5v
+.RE
+.SS "Statically linking the tracepoint provider"
+.sp
+With the static linking method, compiled tracepoint providers are copied into the target application\&.
+.sp
+Define \fBLTTNG_UST_TRACEPOINT_DEFINE\fR definition below the \fBLTTNG_UST_TRACEPOINT_CREATE_PROBES\fR definition in the tracepoint provider source:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#define LTTNG_UST_TRACEPOINT_CREATE_PROBES
+#define LTTNG_UST_TRACEPOINT_DEFINE
+
+#include "tp\&.h"
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Create the tracepoint provider object file:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ cc \-c \-I\&. tp\&.c
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+Although an application instrumented with LTTng\-UST tracepoints can be compiled with a C++ compiler, tracepoint probes should be compiled with a C compiler\&.
+.sp .5v
+.RE
+.sp
+At this point, you \fIcan\fR archive this tracepoint provider object file, possibly with other object files of your application or with other tracepoint provider object files, as a static library:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ ar rc tp\&.a tp\&.o
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Using a static library does have the advantage of centralising the tracepoint providers objects so they can be shared between multiple applications\&. This way, when the tracepoint provider is modified, the source code changes don\(cqt have to be patched into each application\(cqs source code tree\&. The applications need to be relinked after each change, but need not to be otherwise recompiled (unless the tracepoint provider\(cqs API changes)\&.
+.sp
+Then, link your application with this object file (or with the static library containing it) and with \fBliblttng-ust\fR and \fBlibdl\fR (\fBlibc\fR on a BSD system):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ cc \-o app tp\&.o app\&.o \-llttng\-ust \-ldl
+.fi
+.if n \{\
+.RE
+.\}
+.SS "Dynamically loading the tracepoint provider"
+.sp
+The second approach to package the tracepoint provider is to use the dynamic loader: the library and its member functions are explicitly sought, loaded at run time\&.
+.sp
+In this scenario, the tracepoint provider is compiled as a shared object\&.
+.sp
+The process to create the tracepoint provider shared object is pretty much the same as the \fIstatic linking method\fR, except that:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Since the tracepoint provider is not part of the application,
+\fBLTTNG_UST_TRACEPOINT_DEFINE\fR
+must be defined, for each tracepoint provider, in exactly one source file of the
+\fIapplication\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fBLTTNG_UST_TRACEPOINT_PROBE_DYNAMIC_LINKAGE\fR
+must be defined next to
+\fBLTTNG_UST_TRACEPOINT_DEFINE\fR
+.RE
+.sp
+Regarding \fBLTTNG_UST_TRACEPOINT_DEFINE\fR and \fBLTTNG_UST_TRACEPOINT_PROBE_DYNAMIC_LINKAGE\fR, the recommended practice is to use a separate C source file in your application to define them, then include the tracepoint provider header files afterwards\&. For example, as \fBtp-define.c\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#define LTTNG_UST_TRACEPOINT_DEFINE
+#define LTTNG_UST_TRACEPOINT_PROBE_DYNAMIC_LINKAGE
+
+#include "tp\&.h"
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The tracepoint provider object file used to create the shared library is built like it is using the static linking method, but with the \fB-fpic\fR option:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ cc \-c \-fpic \-I\&. tp\&.c
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+It is then linked as a shared library like this:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ cc \-shared \-Wl,\-\-no\-as\-needed \-o tp\&.so tp\&.o \-llttng\-ust
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+This tracepoint provider shared object isn\(cqt linked with the user application: it must be loaded manually\&. This is why the application is built with no mention of this tracepoint provider, but still needs libdl:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ cc \-o app app\&.o tp\-define\&.o \-ldl
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+There are two ways to dynamically load the tracepoint provider shared object:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Load it manually from the application using
+\fBdlopen\fR(3)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Make the dynamic loader load it with the
+\fBLD_PRELOAD\fR
+environment variable (see
+\fBld.so\fR(8))
+.RE
+.sp
+If the application does not dynamically load the tracepoint provider shared object using one of the methods above, tracing is disabled for this application, and the events are not listed in the output of \fBlttng-list\fR(1)\&.
+.sp
+Note that it is not safe to use \fBdlclose\fR(3) on a tracepoint provider shared object that is being actively used for tracing, due to a lack of reference counting from LTTng\-UST to the shared object\&.
+.sp
+For example, statically linking a tracepoint provider to a shared object which is to be dynamically loaded by an application (a plugin, for example) is not safe: the shared object, which contains the tracepoint provider, could be dynamically closed (\fBdlclose\fR(3)) at any time by the application\&.
+.sp
+To instrument a shared object, either:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Statically link the tracepoint provider to the application, or
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Build the tracepoint provider as a shared object (following the procedure shown in this section), and preload it when tracing is needed using the
+\fBLD_PRELOAD\fR
+environment variable\&.
+.RE
+.SS "Using LTTng\-UST with daemons"
+.sp
+Some extra care is needed when using \fBliblttng-ust\fR with daemon applications that call \fBfork\fR(2), \fBclone\fR(2), or BSD\(cqs \fBrfork\fR(2) without a following \fBexec\fR(3) family system call\&. The library \fBliblttng-ust-fork.so\fR needs to be preloaded before starting the application with the \fBLD_PRELOAD\fR environment variable (see \fBld.so\fR(8))\&.
+.sp
+To use \fBliblttng-ust\fR with a daemon application which closes file descriptors that were not opened by it, preload the \fBliblttng-ust-fd.so\fR library before you start the application\&. Typical use cases include daemons closing all file descriptors after \fBfork\fR(2), and buggy applications doing \(lqdouble\-closes\(rq\&.
+.SS "Context information"
+.sp
+Context information can be prepended by the LTTng\-UST tracer before each event, or before specific events\&.
+.sp
+Context fields can be added to specific channels using \fBlttng-add-context\fR(1)\&.
+.sp
+The following context fields are supported by LTTng\-UST:
+.PP
+General context fields
+.RS 4
+.PP
+\fBcpu_id\fR
+.RS 4
+CPU ID\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+This context field is always enabled, and it cannot be added with
+\fBlttng-add-context\fR(1)\&. Its main purpose is to be used for dynamic event filtering\&. See
+\fBlttng-enable-event\fR(1)
+for more information about event filtering\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fBip\fR
+.RS 4
+Instruction pointer: enables recording the exact address from which an event was emitted\&. This context field can be used to reverse\-lookup the source location that caused the event to be emitted\&.
+.RE
+.PP
+\fBpthread_id\fR
+.RS 4
+POSIX thread identifier\&.
+.sp
+Can be used on architectures where
+\fBpthread_t\fR
+maps nicely to an
+\fBunsigned long\fR
+type\&.
+.RE
+.RE
+.PP
+Process context fields
+.RS 4
+.PP
+\fBprocname\fR
+.RS 4
+Thread name, as set by
+\fBexec\fR(3)
+or
+\fBprctl\fR(2)\&. It is recommended that programs set their thread name with
+\fBprctl\fR(2)
+before hitting the first tracepoint for that thread\&.
+.RE
+.PP
+\fBvpid\fR
+.RS 4
+Virtual process ID: process ID as seen from the point of view of the current process ID namespace (see
+\fBpid_namespaces\fR(7))\&.
+.RE
+.PP
+\fBvtid\fR
+.RS 4
+Virtual thread ID: thread ID as seen from the point of view of the current process ID namespace (see
+\fBpid_namespaces\fR(7))\&.
+.RE
+.RE
+.PP
+perf context fields
+.RS 4
+.PP
+\fBperf:thread:COUNTER\fR
+.RS 4
+perf counter named
+\fICOUNTER\fR\&. Use
+\fBlttng add-context --list\fR
+to list the available perf counters\&.
+.sp
+Only available on IA\-32 and x86\-64 architectures\&.
+.RE
+.PP
+\fBperf:thread:raw:rN:NAME\fR
+.RS 4
+perf counter with raw ID
+\fIN\fR
+and custom name
+\fINAME\fR\&. See
+\fBlttng-add-context\fR(1)
+for more details\&.
+.RE
+.RE
+.PP
+Namespace context fields (see \fBnamespaces\fR(7))
+.RS 4
+.PP
+\fBcgroup_ns\fR
+.RS 4
+Inode number of the current control group namespace (see
+\fBcgroup_namespaces\fR(7)) in the proc file system\&.
+.RE
+.PP
+\fBipc_ns\fR
+.RS 4
+Inode number of the current IPC namespace (see
+\fBipc_namespaces\fR(7)) in the proc file system\&.
+.RE
+.PP
+\fBmnt_ns\fR
+.RS 4
+Inode number of the current mount point namespace (see
+\fBmount_namespaces\fR(7)) in the proc file system\&.
+.RE
+.PP
+\fBnet_ns\fR
+.RS 4
+Inode number of the current network namespace (see
+\fBnetwork_namespaces\fR(7)) in the proc file system\&.
+.RE
+.PP
+\fBpid_ns\fR
+.RS 4
+Inode number of the current process ID namespace (see
+\fBpid_namespaces\fR(7)) in the proc file system\&.
+.RE
+.PP
+\fBtime_ns\fR
+.RS 4
+Inode number of the current clock namespace (see
+\fBtime_namespaces\fR(7)) in the proc file system\&.
+.RE
+.PP
+\fBuser_ns\fR
+.RS 4
+Inode number of the current user namespace (see
+\fBuser_namespaces\fR(7)) in the proc file system\&.
+.RE
+.PP
+\fButs_ns\fR
+.RS 4
+Inode number of the current UTS namespace (see
+\fButs_namespaces\fR(7)) in the proc file system\&.
+.RE
+.RE
+.PP
+Credential context fields (see \fBcredentials\fR(7))
+.RS 4
+.PP
+\fBvuid\fR
+.RS 4
+Virtual real user ID: real user ID as seen from the point of view of the current user namespace (see
+\fBuser_namespaces\fR(7))\&.
+.RE
+.PP
+\fBvgid\fR
+.RS 4
+Virtual real group ID: real group ID as seen from the point of view of the current user namespace (see
+\fBuser_namespaces\fR(7))\&.
+.RE
+.PP
+\fBveuid\fR
+.RS 4
+Virtual effective user ID: effective user ID as seen from the point of view of the current user namespace (see
+\fBuser_namespaces\fR(7))\&.
+.RE
+.PP
+\fBvegid\fR
+.RS 4
+Virtual effective group ID: effective group ID as seen from the point of view of the current user namespace (see
+\fBuser_namespaces\fR(7))\&.
+.RE
+.PP
+\fBvsuid\fR
+.RS 4
+Virtual saved set\-user ID: saved set\-user ID as seen from the point of view of the current user namespace (see
+\fBuser_namespaces\fR(7))\&.
+.RE
+.PP
+\fBvsgid\fR
+.RS 4
+Virtual saved set\-group ID: saved set\-group ID as seen from the point of view of the current user namespace (see
+\fBuser_namespaces\fR(7))\&.
+.RE
+.RE
+.SS "LTTng\-UST state dump"
+.sp
+If an application that uses \fBliblttng-ust\fR becomes part of a tracing session, information about its currently loaded shared objects, their build IDs, and their debug link information are emitted as events by the tracer\&.
+.sp
+The following LTTng\-UST state dump events exist and must be enabled to record application state dumps\&. Note that, during the state dump phase, LTTng\-UST can also emit \fIshared library load/unload\fR events (see \fIShared library load/unload tracking\fR below)\&.
+.PP
+\fBlttng_ust_statedump:start\fR
+.RS 4
+Emitted when the state dump begins\&.
+.sp
+This event has no fields\&.
+.RE
+.PP
+\fBlttng_ust_statedump:end\fR
+.RS 4
+Emitted when the state dump ends\&. Once this event is emitted, it is guaranteed that, for a given process, the state dump is complete\&.
+.sp
+This event has no fields\&.
+.RE
+.PP
+\fBlttng_ust_statedump:bin_info\fR
+.RS 4
+Emitted when information about a currently loaded executable or shared object is found\&.
+.sp
+Fields:
+.TS
+allbox tab(:);
+ltB ltB.
+T{
+Field name
+T}:T{
+Description
+T}
+.T&
+lt lt
+lt lt
+lt lt
+lt lt
+lt lt
+lt lt.
+T{
+\fBbaddr\fR
+T}:T{
+Base address of loaded executable\&.
+T}
+T{
+\fBmemsz\fR
+T}:T{
+Size of loaded executable in memory\&.
+T}
+T{
+\fBpath\fR
+T}:T{
+Path to loaded executable file\&.
+T}
+T{
+\fBis_pic\fR
+T}:T{
+Whether or not the executable is position\-independent code\&.
+T}
+T{
+\fBhas_build_id\fR
+T}:T{
+Whether or not the executable has a build ID\&. If this field is 1, you can expect that an
+\fBlttng_ust_statedump:build_id\fR
+event record follows this one (not necessarily immediately after)\&.
+T}
+T{
+\fBhas_debug_link\fR
+T}:T{
+Whether or not the executable has debug link information\&. If this field is 1, you can expect that an
+\fBlttng_ust_statedump:debug_link\fR
+event record follows this one (not necessarily immediately after)\&.
+T}
+.TE
+.sp 1
+.RE
+.PP
+\fBlttng_ust_statedump:build_id\fR
+.RS 4
+Emitted when a build ID is found in a currently loaded shared library\&. See
+Debugging Information in Separate Files <https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html>
+for more information about build IDs\&.
+.sp
+Fields:
+.TS
+allbox tab(:);
+ltB ltB.
+T{
+Field name
+T}:T{
+Description
+T}
+.T&
+lt lt
+lt lt.
+T{
+\fBbaddr\fR
+T}:T{
+Base address of loaded library\&.
+T}
+T{
+\fBbuild_id\fR
+T}:T{
+Build ID\&.
+T}
+.TE
+.sp 1
+.RE
+.PP
+\fBlttng_ust_statedump:debug_link\fR
+.RS 4
+Emitted when debug link information is found in a currently loaded shared library\&. See
+Debugging Information in Separate Files <https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html>
+for more information about debug links\&.
+.sp
+Fields:
+.TS
+allbox tab(:);
+ltB ltB.
+T{
+Field name
+T}:T{
+Description
+T}
+.T&
+lt lt
+lt lt
+lt lt.
+T{
+\fBbaddr\fR
+T}:T{
+Base address of loaded library\&.
+T}
+T{
+\fBcrc\fR
+T}:T{
+Debug link file\(cqs CRC\&.
+T}
+T{
+\fBfilename\fR
+T}:T{
+Debug link file name\&.
+T}
+.TE
+.sp 1
+.RE
+.PP
+\fBlttng_ust_statedump:procname\fR
+.RS 4
+The process procname at process start\&.
+.sp
+Fields:
+.TS
+allbox tab(:);
+ltB ltB.
+T{
+Field name
+T}:T{
+Description
+T}
+.T&
+lt lt.
+T{
+\fBprocname\fR
+T}:T{
+The process name\&.
+T}
+.TE
+.sp 1
+.RE
+.SS "Shared library load/unload tracking"
+.sp
+The \fILTTng\-UST state dump\fR and the LTTng\-UST helper library to instrument the dynamic linker (see \fBliblttng-ust-dl\fR(3)) can emit \fBshared library load/unload tracking\fR events\&.
+.sp
+The following shared library load/unload tracking events exist and must be enabled to track the loading and unloading of shared libraries:
+.PP
+\fBlttng_ust_lib:load\fR
+.RS 4
+Emitted when a shared library (shared object) is loaded\&.
+.sp
+Fields:
+.TS
+allbox tab(:);
+ltB ltB.
+T{
+Field name
+T}:T{
+Description
+T}
+.T&
+lt lt
+lt lt
+lt lt
+lt lt
+lt lt.
+T{
+\fBbaddr\fR
+T}:T{
+Base address of loaded library\&.
+T}
+T{
+\fBmemsz\fR
+T}:T{
+Size of loaded library in memory\&.
+T}
+T{
+\fBpath\fR
+T}:T{
+Path to loaded library file\&.
+T}
+T{
+\fBhas_build_id\fR
+T}:T{
+Whether or not the library has a build ID\&. If this field is 1, you can expect that an
+\fBlttng_ust_lib:build_id\fR
+event record follows this one (not necessarily immediately after)\&.
+T}
+T{
+\fBhas_debug_link\fR
+T}:T{
+Whether or not the library has debug link information\&. If this field is 1, you can expect that an
+\fBlttng_ust_lib:debug_link\fR
+event record follows this one (not necessarily immediately after)\&.
+T}
+.TE
+.sp 1
+.RE
+.PP
+\fBlttng_ust_lib:unload\fR
+.RS 4
+Emitted when a shared library (shared object) is unloaded\&.
+.sp
+Fields:
+.TS
+allbox tab(:);
+ltB ltB.
+T{
+Field name
+T}:T{
+Description
+T}
+.T&
+lt lt.
+T{
+\fBbaddr\fR
+T}:T{
+Base address of unloaded library\&.
+T}
+.TE
+.sp 1
+.RE
+.PP
+\fBlttng_ust_lib:build_id\fR
+.RS 4
+Emitted when a build ID is found in a loaded shared library (shared object)\&. See
+Debugging Information in Separate Files <https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html>
+for more information about build IDs\&.
+.sp
+Fields:
+.TS
+allbox tab(:);
+ltB ltB.
+T{
+Field name
+T}:T{
+Description
+T}
+.T&
+lt lt
+lt lt.
+T{
+\fBbaddr\fR
+T}:T{
+Base address of loaded library\&.
+T}
+T{
+\fBbuild_id\fR
+T}:T{
+Build ID\&.
+T}
+.TE
+.sp 1
+.RE
+.PP
+\fBlttng_ust_lib:debug_link\fR
+.RS 4
+Emitted when debug link information is found in a loaded shared library (shared object)\&. See
+Debugging Information in Separate Files <https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html>
+for more information about debug links\&.
+.sp
+Fields:
+.TS
+allbox tab(:);
+ltB ltB.
+T{
+Field name
+T}:T{
+Description
+T}
+.T&
+lt lt
+lt lt
+lt lt.
+T{
+\fBbaddr\fR
+T}:T{
+Base address of loaded library\&.
+T}
+T{
+\fBcrc\fR
+T}:T{
+Debug link file\(cqs CRC\&.
+T}
+T{
+\fBfilename\fR
+T}:T{
+Debug link file name\&.
+T}
+.TE
+.sp 1
+.RE
+.SS "Detect if LTTng\-UST is loaded"
+.sp
+To detect if \fBliblttng-ust\fR is loaded from an application:
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Define the
+\fBlttng_ust_loaded\fR
+weak symbol globally:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+int lttng_ust_loaded __attribute__((weak));
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+This weak symbol is set by the constructor of
+\fBliblttng-ust\fR\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Test
+\fBlttng_ust_loaded\fR
+where needed:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+/* \&.\&.\&. */
+
+if (lttng_ust_loaded) {
+    /* LTTng\-UST is loaded */
+} else {
+    /* LTTng\-UST is NOT loaded */
+}
+
+/* \&.\&.\&. */
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "EXAMPLE"
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+A few examples are available in the directory of LTTng\-UST\(cqs source tree\&.
+.sp .5v
+.RE
+.sp
+This example shows all the features documented in the previous sections\&. The \fIstatic linking\fR method is chosen here to link the application with the tracepoint provider\&.
+.sp
+You can compile the source files and link them together statically like this:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ cc \-c \-I\&. tp\&.c
+$ cc \-c app\&.c
+$ cc \-o app tp\&.o app\&.o \-llttng\-ust \-ldl
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Using the \fBlttng\fR(1) tool, create an LTTng tracing session, enable all the events of this tracepoint provider, and start tracing:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ lttng create my\-session
+$ lttng enable\-event \-\-userspace \*(Aqmy_provider:*\*(Aq
+$ lttng start
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+You may also enable specific events:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ lttng enable\-event \-\-userspace my_provider:big_event
+$ lttng enable\-event \-\-userspace my_provider:event_instance2
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Run the application:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ \&./app some arguments
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Stop the current tracing session and inspect the recorded events:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ lttng stop
+$ lttng view
+.fi
+.if n \{\
+.RE
+.\}
+.SS "Tracepoint provider header file"
+.sp
+\fBtp.h\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#undef LTTNG_UST_TRACEPOINT_PROVIDER
+#define LTTNG_UST_TRACEPOINT_PROVIDER my_provider
+
+#undef LTTNG_USTTRACEPOINT_INCLUDE
+#define LTTNG_USTTRACEPOINT_INCLUDE "\&./tp\&.h"
+
+#if !defined(_TP_H) || \e
+    defined(LTTNG_UST_TRACEPOINT_HEADER_MULTI_READ)
+#define _TP_H
+
+#include <lttng/tracepoint\&.h>
+#include <stdio\&.h>
+
+#include "app\&.h"
+
+LTTNG_UST_TRACEPOINT_EVENT(
+    my_provider,
+    simple_event,
+    LTTNG_UST_TP_ARGS(
+        int, my_integer_arg,
+        const char *, my_string_arg
+    ),
+    LTTNG_UST_TP_FIELDS(
+        lttng_ust_field_string(argc, my_string_arg)
+        lttng_ust_field_integer(int, argv, my_integer_arg)
+    )
+)
+
+LTTNG_UST_TRACEPOINT_ENUM(
+    my_provider,
+    my_enum,
+    LTTNG_UST_TP_ENUM_VALUES(
+        lttng_ust_field_enum_value("ZERO", 0)
+        lttng_ust_field_enum_value("ONE", 1)
+        lttng_ust_field_enum_value("TWO", 2)
+        lttng_ust_field_enum_range("A RANGE", 52, 125)
+        lttng_ust_field_enum_value("ONE THOUSAND", 1000)
+    )
+)
+
+LTTNG_UST_TRACEPOINT_EVENT(
+    my_provider,
+    big_event,
+    LTTNG_UST_TP_ARGS(
+        int, my_integer_arg,
+        const char *, my_string_arg,
+        FILE *, stream,
+        double, flt_arg,
+        int *, array_arg
+    ),
+    LTTNG_UST_TP_FIELDS(
+        lttng_ust_field_integer(int, int_field1, my_integer_arg * 2)
+        lttng_ust_field_integer_hex(long int, stream_pos,
+                                    ftell(stream))
+        lttng_ust_field_float(double, float_field, flt_arg)
+        lttng_ust_field_string(string_field, my_string_arg)
+        lttng_ust_field_array(int, array_field, array_arg, 7)
+        lttng_ust_field_array_text(char, array_text_field,
+                                   array_arg, 5)
+        lttng_ust_field_sequence(int, seq_field, array_arg, int,
+                                 my_integer_arg / 10)
+        lttng_ust_field_sequence_text(char, seq_text_field,
+                                      array_arg, int,
+                                      my_integer_arg / 5)
+        lttng_ust_field_enum(my_provider, my_enum, int,
+                             enum_field, array_arg[1])
+    )
+)
+
+LTTNG_UST_TRACEPOINT_LOGLEVEL(my_provider, big_event,
+                              LTTNG_UST_TRACEPOINT_LOGLEVEL_WARNING)
+
+LTTNG_UST_TRACEPOINT_EVENT_CLASS(
+    my_provider,
+    my_tracepoint_class,
+    LTTNG_UST_TP_ARGS(
+        int, my_integer_arg,
+        struct app_struct *, app_struct_arg
+    ),
+    LTTNG_UST_TP_FIELDS(
+        lttng_ust_field_integer(int, a, my_integer_arg)
+        lttng_ust_field_integer(unsigned long, b, app_struct_arg\->b)
+        lttng_ust_field_string(c, app_struct_arg\->c)
+    )
+)
+
+LTTNG_UST_TRACEPOINT_EVENT_INSTANCE(
+    my_provider,
+    my_tracepoint_class,
+    my_provider,
+    event_instance1,
+    LTTNG_UST_TP_ARGS(
+        int, my_integer_arg,
+        struct app_struct *, app_struct_arg
+    )
+)
+
+LTTNG_UST_TRACEPOINT_EVENT_INSTANCE(
+    my_provider,
+    my_tracepoint_class,
+    my_provider,
+    event_instance2,
+    LTTNG_UST_TP_ARGS(
+        int, my_integer_arg,
+        struct app_struct *, app_struct_arg
+    )
+)
+
+LTTNG_UST_TRACEPOINT_LOGLEVEL(my_provider, event_instance2,
+                              LTTNG_UST_TRACEPOINT_LOGLEVEL_INFO)
+
+LTTNG_UST_TRACEPOINT_EVENT_INSTANCE(
+    my_provider,
+    my_tracepoint_class,
+    my_provider,
+    event_instance3,
+    LTTNG_UST_TP_ARGS(
+        int, my_integer_arg,
+        struct app_struct *, app_struct_arg
+    )
+)
+
+#endif /* _TP_H */
+
+#include <lttng/tracepoint\-event\&.h>
+.fi
+.if n \{\
+.RE
+.\}
+.SS "Tracepoint provider source file"
+.sp
+\fBtp.c\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#define LTTNG_UST_TRACEPOINT_CREATE_PROBES
+#define LTTNG_UST_TRACEPOINT_DEFINE
+
+#include "tp\&.h"
+.fi
+.if n \{\
+.RE
+.\}
+.SS "Application header file"
+.sp
+\fBapp.h\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#ifndef _APP_H
+#define _APP_H
+
+struct app_struct {
+    unsigned long b;
+    const char *c;
+    double d;
+};
+
+#endif /* _APP_H */
+.fi
+.if n \{\
+.RE
+.\}
+.SS "Application source file"
+.sp
+\fBapp.c\fR:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#include <stdlib\&.h>
+#include <stdio\&.h>
+
+#include "tp\&.h"
+#include "app\&.h"
+
+static int array_of_ints[] = {
+    100, \-35, 1, 23, 14, \-6, 28, 1001, \-3000,
+};
+
+int main(int argc, char* argv[])
+{
+    FILE *stream;
+    struct app_struct app_struct;
+
+    lttng_ust_tracepoint(my_provider, simple_event, argc, argv[0]);
+    stream = fopen("/tmp/app\&.txt", "w");
+
+    if (!stream) {
+        fprintf(stderr,
+                "Error: Cannot open /tmp/app\&.txt for writing\en");
+        return EXIT_FAILURE;
+    }
+
+    if (fprintf(stream, "0123456789") != 10) {
+        fclose(stream);
+        fprintf(stderr, "Error: Cannot write to /tmp/app\&.txt\en");
+        return EXIT_FAILURE;
+    }
+
+    lttng_ust_tracepoint(my_provider, big_event, 35,
+                         "hello tracepoint", stream, \-3\&.14,
+                         array_of_ints);
+    fclose(stream);
+    app_struct\&.b = argc;
+    app_struct\&.c = "[the string]";
+    lttng_ust_tracepoint(my_provider, event_instance1, 23,
+                         &app_struct);
+    app_struct\&.b = argc * 5;
+    app_struct\&.c = "[other string]";
+    lttng_ust_tracepoint(my_provider, event_instance2, 17,
+                         &app_struct);
+    app_struct\&.b = 23;
+    app_struct\&.c = "nothing";
+    lttng_ust_tracepoint(my_provider, event_instance3, \-52,
+                         &app_struct);
+    return EXIT_SUCCESS;
+}
+.fi
+.if n \{\
+.RE
+.\}
+.SH "ENVIRONMENT VARIABLES"
+.PP
+\fBLTTNG_HOME\fR
+.RS 4
+Alternative user\(cqs home directory\&. This variable is useful when the user running the instrumented application has a non\-writable home directory\&.
+.sp
+Unix sockets used for the communication between
+\fBliblttng-ust\fR
+and the LTTng session and consumer daemons (part of the LTTng\-tools project) are located in a specific directory under
+\fB$LTTNG_HOME\fR
+(or
+\fB$HOME\fR
+if
+\fB$LTTNG_HOME\fR
+is not set)\&.
+.RE
+.PP
+\fBLTTNG_UST_ALLOW_BLOCKING\fR
+.RS 4
+If set, allow the application to retry event tracing when there\(cqs no space left for the event record in the sub\-buffer, therefore effectively blocking the application until space is made available or the configured timeout is reached\&.
+.sp
+To allow an application to block during tracing, you also need to specify a blocking timeout when you create a channel with the
+\fB--blocking-timeout\fR
+option of the
+\fBlttng-enable-channel\fR(1)
+command\&.
+.sp
+This option can be useful in workloads generating very large trace data throughput, where blocking the application is an acceptable trade\-off to prevent discarding event records\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBWarning\fR
+.ps -1
+.br
+Setting this environment variable may significantly affect application timings\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fBLTTNG_UST_CLOCK_PLUGIN\fR
+.RS 4
+Path to the shared object which acts as the clock override plugin\&. An example of such a plugin can be found in the LTTng\-UST documentation under
+.RE
+.PP
+\fBLTTNG_UST_DEBUG\fR
+.RS 4
+If set, enable
+\fBliblttng-ust\fR\*(Aqs debug and error output\&.
+.RE
+.PP
+\fBLTTNG_UST_GETCPU_PLUGIN\fR
+.RS 4
+Path to the shared object which acts as the
+\fBgetcpu()\fR
+override plugin\&. An example of such a plugin can be found in the LTTng\-UST documentation under
+.RE
+.PP
+\fBLTTNG_UST_REGISTER_TIMEOUT\fR
+.RS 4
+Waiting time for the
+\fIregistration done\fR
+session daemon command before proceeding to execute the main program (milliseconds)\&.
+.sp
+The value
+\fB0\fR
+means
+\fIdo not wait\fR\&. The value
+\fB-1\fR
+means
+\fIwait forever\fR\&. Setting this environment variable to
+\fB0\fR
+is recommended for applications with time constraints on the process startup time\&.
+.sp
+Default: 3000\&.
+.RE
+.PP
+\fBLTTNG_UST_WITHOUT_BADDR_STATEDUMP\fR
+.RS 4
+If set, prevents
+\fBliblttng-ust\fR
+from performing a base address state dump (see the
+\fILTTng\-UST state dump\fR
+section above)\&.
+.RE
+.PP
+\fBLTTNG_UST_WITHOUT_PROCNAME_STATEDUMP\fR
+.RS 4
+If set, prevents
+\fBliblttng-ust\fR
+from performing a procname state dump (see the
+\fILTTng\-UST state dump\fR
+section above)\&.
+.RE
+.SH "BUGS"
+.sp
+If you encounter any issue or usability problem, please report it on the LTTng bug tracker <https://bugs.lttng.org/projects/lttng-ust>\&.
+.SH "RESOURCES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+LTTng project website <http://lttng.org>
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+LTTng documentation <http://lttng.org/docs>
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Git repositories <http://git.lttng.org>
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+GitHub organization <http://github.com/lttng>
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Continuous integration <http://ci.lttng.org/>
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Mailing list <http://lists.lttng.org>
+for support and development:
+\fBlttng-dev@lists.lttng.org\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+IRC channel <irc://irc.oftc.net/lttng>:
+\fB#lttng\fR
+on
+\fBirc.oftc.net\fR
+.RE
+.SH "COPYRIGHTS"
+.sp
+This library is part of the LTTng\-UST project\&.
+.sp
+This library is distributed under the GNU Lesser General Public License, version 2\&.1 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html>\&. See the for more details\&.
+.SH "THANKS"
+.sp
+Thanks to Ericsson for funding this work, providing real\-life use cases, and testing\&.
+.sp
+Special thanks to Michel Dagenais and the DORSAL laboratory <http://www.dorsal.polymtl.ca/> at \('Ecole Polytechnique de Montr\('eal for the LTTng journey\&.
+.SH "AUTHORS"
+.sp
+LTTng\-UST was originally written by Mathieu Desnoyers, with additional contributions from various other people\&. It is currently maintained by Mathieu Desnoyers <mailto:mathieu.desnoyers@efficios.com>\&.
+.SH "SEE ALSO"
+.sp
+\fBlttng_ust_tracef\fR(3), \fBlttng_ust_tracelog\fR(3), \fBlttng-gen-tp\fR(1), \fBlttng-ust-dl\fR(3), \fBlttng-ust-cyg-profile\fR(3), \fBlttng\fR(1), \fBlttng-enable-event\fR(1), \fBlttng-list\fR(1), \fBlttng-add-context\fR(1), \fBbabeltrace\fR(1), \fBdlopen\fR(3), \fBld.so\fR(8)
