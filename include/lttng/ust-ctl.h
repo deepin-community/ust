@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: GPL-2.0-only
  *
- * Copyright (C) 2011 Julien Desfossez <julien.desfossez@polymtl.ca>
+ * Copyright (C) 2011 EfficiOS Inc.
  * Copyright (C) 2011-2013 Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
  */
 
@@ -17,6 +17,10 @@
 #include <lttng/ust-abi.h>
 #include <lttng/ust-utils.h>
 #include <lttng/ust-sigbus.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef LTTNG_UST_UUID_LEN
 #define LTTNG_UST_UUID_LEN	16
@@ -655,5 +659,9 @@ int lttng_ust_ctl_counter_clear(struct lttng_ust_ctl_daemon_counter *counter,
 		const size_t *dimension_indexes);
 
 void lttng_ust_ctl_sigbus_handle(void *addr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _LTTNG_UST_CTL_H */

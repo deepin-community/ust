@@ -8,7 +8,7 @@ dnl Process this file with autoconf to produce a configure script.
 # Project version information
 m4_define([ust_version_major], [2])
 m4_define([ust_version_minor], [13])
-m4_define([ust_version_patch], [0])
+m4_define([ust_version_patch], [6])
 m4_define([ust_version_dev_stage], [])
 m4_define([ust_version], ust_version_major[.]ust_version_minor[.]ust_version_patch[]ust_version_dev_stage)
 m4_define([ust_version_name], [[Nordicité]])
@@ -162,6 +162,7 @@ m4_define([WARN_FLAGS_LIST], [ dnl
   -Wno-sign-compare dnl
   -Wno-missing-field-initializers dnl
   -Wno-null-dereference dnl
+  -Wno-gnu dnl Disable warnings for GNU extensions on Clang
 ])
 
 # Pass -Werror as an extra flag during the test: this is needed to make the
@@ -340,10 +341,15 @@ AE_FEATURE([jni-interface], [build JNI interface between C and Java])
 AE_FEATURE_DEFAULT_DISABLE
 AE_FEATURE([java-agent-jul],[build the LTTng UST Java agent with JUL support])
 
-# Build the Java Log4j agent
+# Build the Java Log4j 1.x agent
 # Disabled by default
 AE_FEATURE_DEFAULT_DISABLE
-AE_FEATURE([java-agent-log4j],[build the LTTng UST Java agent with Log4j support])
+AE_FEATURE([java-agent-log4j],[build the LTTng UST Java agent with Log4j 1.x support])
+
+# Build the Java Log4j 2.x agent
+# Disabled by default
+AE_FEATURE_DEFAULT_DISABLE
+AE_FEATURE([java-agent-log4j2],[build the LTTng UST Java agent with Log4j 2.x support])
 
 # Build both Java agents
 # Disabled by default
@@ -395,6 +401,10 @@ AE_IF_FEATURE_DISABLED([shared], [
 AE_IF_FEATURE_ENABLED([java-agent-all], [
   AE_FEATURE_ENABLE([java-agent-jul])
   AE_FEATURE_ENABLE([java-agent-log4j])
+  # This backport to a stable branch requires the explicit use of
+  # '--enable-java-agent-log4j2' to avoid introducing a new dependency in
+  # an existing configuration.
+  dnl AE_FEATURE_ENABLE([java-agent-lkog4j2])
 ])
 
 
@@ -404,7 +414,9 @@ AE_IF_FEATURE_ENABLED([java-agent-all], [
 
 # The numa integration requires libnuma
 AE_IF_FEATURE_ENABLED([numa], [
-  AC_CHECK_LIB([numa], [numa_available], [], [
+  AC_CHECK_LIB([numa], [numa_available], [
+    AC_DEFINE([HAVE_LIBNUMA], [1], [Define to 1 if libnuma is available.])
+  ], [
     AC_MSG_ERROR([dnl
 libnuma is not available. Please either install it (e.g. libnuma-dev) or use
 [LDFLAGS]=-Ldir to specify the right location, or use --disable-numa configure
@@ -414,7 +426,8 @@ argument to disable NUMA support.
 ])
 
 # The JNI interface and Java Agents require a working Java JDK
-AS_IF([AE_IS_FEATURE_ENABLED([jni-interface]) || AE_IS_FEATURE_ENABLED([java-agent-jul]) || AE_IS_FEATURE_ENABLED([java-agent-log4j])], [
+AS_IF([AE_IS_FEATURE_ENABLED([jni-interface]) || AE_IS_FEATURE_ENABLED([java-agent-jul]) || \
+    AE_IS_FEATURE_ENABLED([java-agent-log4j]) || AE_IS_FEATURE_ENABLED([java-agent-log4j2])], [
   AX_PROG_JAVAC
   AX_PROG_JAVA
   AX_PROG_JAR
@@ -432,7 +445,7 @@ AS_IF([AE_IS_FEATURE_ENABLED([jni-interface]) || AE_IS_FEATURE_ENABLED([java-age
   CPPFLAGS="$saved_CPPFLAGS"
 ])
 
-# The log4j agent requires the log4j jar in the classpath
+# The log4j 1.x agent requires the log4j jar in the classpath
 AE_IF_FEATURE_ENABLED([java-agent-log4j], [
   AX_CHECK_CLASS([org.apache.log4j.Logger])
   AS_IF([test "x$ac_cv_class_org_apache_log4j_Logger" = "xno"], [
@@ -440,6 +453,21 @@ AE_IF_FEATURE_ENABLED([java-agent-log4j], [
 The UST Java agent support for log4j was requested but the Log4j classes were
 not found. Please specify the location of the Log4j jar via the Java CLASSPATH
 environment variable, e.g. ./configure CLASSPATH="/path/to/log4j.jar"
+
+Current CLASSPATH: "$CLASSPATH"
+    ])
+  ])
+])
+
+# The log4j 2.x agent requires the log4j core and api jars in the classpath
+AE_IF_FEATURE_ENABLED([java-agent-log4j2], [
+  AX_CHECK_CLASS([org.apache.logging.log4j.Logger])
+  AX_CHECK_CLASS([org.apache.logging.log4j.core.Core])
+  AS_IF([test "x$ac_cv_class_org_apache_logging_log4j_Logger" = "xno" || test "x$ac_cv_class_org_apache_logging_log4j_core_Core" = "xno"], [
+    AC_MSG_ERROR([dnl
+The UST Java agent support for log4j was requested but the Log4j classes were
+not found. Please specify the location of the Log4j API and core 2.x jars via the Java CLASSPATH
+environment variable, e.g. ./configure CLASSPATH="/path/to/log4j-core.jar:/path/to/log4j-api.jar"
 
 Current CLASSPATH: "$CLASSPATH"
     ])
@@ -524,9 +552,11 @@ AC_DEFINE([LTTNG_UST_CTL_LIB_SONAME_MAJOR], [ust_ctl_lib_version_current], [Majo
 
 AM_CONDITIONAL([ENABLE_EXAMPLES], AE_IS_FEATURE_ENABLED([examples]))
 AM_CONDITIONAL([ENABLE_GEN_TP_EXAMPLES], [test "x$PYTHON" != "x"])
-AM_CONDITIONAL([ENABLE_JAVA_AGENT], AE_IS_FEATURE_ENABLED([java-agent-jul]) || AE_IS_FEATURE_ENABLED([java-agent-log4j]))
+AM_CONDITIONAL([ENABLE_JAVA_AGENT], AE_IS_FEATURE_ENABLED([java-agent-jul]) || AE_IS_FEATURE_ENABLED([java-agent-log4j]) || AE_IS_FEATURE_ENABLED([java-agent-log4j2]))
 AM_CONDITIONAL([ENABLE_JAVA_AGENT_WITH_JUL], AE_IS_FEATURE_ENABLED([java-agent-jul]))
 AM_CONDITIONAL([ENABLE_JAVA_AGENT_WITH_LOG4J], AE_IS_FEATURE_ENABLED([java-agent-log4j]))
+AM_CONDITIONAL([ENABLE_JAVA_AGENT_WITH_LOG4J2], AE_IS_FEATURE_ENABLED([java-agent-log4j2]))
+AM_CONDITIONAL([ENABLE_JAVA_AGENT_WITH_LOG4J_COMMON], AE_IS_FEATURE_ENABLED([java-agent-log4j]) || AE_IS_FEATURE_ENABLED([java-agent-log4j2]))
 AM_CONDITIONAL([ENABLE_JNI_INTERFACE], AE_IS_FEATURE_ENABLED([jni-interface]))
 AM_CONDITIONAL([ENABLE_MAN_PAGES], AE_IS_FEATURE_ENABLED([man-pages]))
 AM_CONDITIONAL([ENABLE_NUMA], AE_IS_FEATURE_ENABLED([numa]))
@@ -588,6 +618,7 @@ AC_CONFIG_FILES([
   src/lib/lttng-ust-java-agent/java/lttng-ust-agent-common/Makefile
   src/lib/lttng-ust-java-agent/java/lttng-ust-agent-jul/Makefile
   src/lib/lttng-ust-java-agent/java/lttng-ust-agent-log4j/Makefile
+  src/lib/lttng-ust-java-agent/java/lttng-ust-agent-log4j2/Makefile
   src/lib/lttng-ust-java-agent/java/Makefile
   src/lib/lttng-ust-java-agent/jni/common/Makefile
   src/lib/lttng-ust-java-agent/jni/jul/Makefile
@@ -626,6 +657,7 @@ AC_CONFIG_FILES([
   tests/regression/abi0-conflict/Makefile
   tests/regression/Makefile
   tests/unit/gcc-weak-hidden/Makefile
+  tests/unit/libcommon/Makefile
   tests/unit/libmsgpack/Makefile
   tests/unit/libringbuffer/Makefile
   tests/unit/Makefile
@@ -686,7 +718,10 @@ AE_IS_FEATURE_ENABLED([java-agent-jul]) && value=1 || value=0
 PPRINT_PROP_BOOL_CUSTOM([Java agent (JUL support)], $value, [use --enable-java-agent-jul])
 
 AE_IS_FEATURE_ENABLED([java-agent-log4j]) && value=1 || value=0
-PPRINT_PROP_BOOL_CUSTOM([Java agent (Log4j support)], $value, [use --enable-java-agent-log4j])
+PPRINT_PROP_BOOL_CUSTOM([Java agent (Log4j 1.x support)], $value, [use --enable-java-agent-log4j])
+
+AE_IS_FEATURE_ENABLED([java-agent-log4j2]) && value=1 || value=0
+PPRINT_PROP_BOOL_CUSTOM([Java agent (Log4j 2.x support)], $value, [use --enable-java-agent-log4j2])
 
 AE_IS_FEATURE_ENABLED([jni-interface]) && value=1 || value=0
 PPRINT_PROP_BOOL_CUSTOM([JNI interface (JNI)], $value, [use --enable-jni-interface])

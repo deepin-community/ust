@@ -205,7 +205,7 @@ int subbuffer_id_check_index(const struct lttng_ust_ring_buffer_config *config,
 
 static inline
 int lib_ring_buffer_backend_get_pages(const struct lttng_ust_ring_buffer_config *config,
-			struct lttng_ust_ring_buffer_ctx *ctx,
+			const struct lttng_ust_ring_buffer_ctx *ctx,
 			struct lttng_ust_ring_buffer_backend_pages **backend_pages)
 {
 	struct lttng_ust_ring_buffer_ctx_private *ctx_private = ctx->priv;
@@ -244,7 +244,7 @@ static inline
 struct lttng_ust_ring_buffer_backend_pages *
 	lib_ring_buffer_get_backend_pages_from_ctx(
 		const struct lttng_ust_ring_buffer_config *config __attribute__((unused)),
-		struct lttng_ust_ring_buffer_ctx *ctx)
+		const struct lttng_ust_ring_buffer_ctx *ctx)
 {
 	return ctx->priv->backend_pages;
 }
@@ -256,9 +256,7 @@ struct lttng_ust_ring_buffer_backend_pages *
 #ifdef LTTNG_RING_BUFFER_COUNT_EVENTS
 static inline
 void subbuffer_count_record(const struct lttng_ust_ring_buffer_config *config,
-			    const struct lttng_ust_ring_buffer_ctx *ctx,
-			    struct lttng_ust_ring_buffer_backend *bufb,
-			    unsigned long idx, struct lttng_ust_shm_handle *handle)
+			    const struct lttng_ust_ring_buffer_ctx *ctx)
 {
 	struct lttng_ust_ring_buffer_backend_pages *backend_pages;
 
@@ -272,10 +270,7 @@ void subbuffer_count_record(const struct lttng_ust_ring_buffer_config *config,
 #else /* LTTNG_RING_BUFFER_COUNT_EVENTS */
 static inline
 void subbuffer_count_record(const struct lttng_ust_ring_buffer_config *config __attribute__((unused)),
-		const struct lttng_ust_ring_buffer_ctx *ctx __attribute__((unused)),
-		struct lttng_ust_ring_buffer_backend *bufb __attribute__((unused)),
-		unsigned long idx __attribute__((unused)),
-		struct lttng_ust_shm_handle *handle __attribute__((unused)))
+		const struct lttng_ust_ring_buffer_ctx *ctx __attribute__((unused)))
 {
 }
 #endif /* #else LTTNG_RING_BUFFER_COUNT_EVENTS */
@@ -600,6 +595,21 @@ int update_read_sb_index(const struct lttng_ust_ring_buffer_config *config,
 #define inline_memcpy(dest, src, n)	memcpy(dest, src, n)
 #endif
 
+#define LOAD_UNALIGNED_INT(type, p) \
+	({ \
+		struct packed_struct { type __v; } __attribute__((packed)); \
+		(((const struct packed_struct *) (p))->__v); \
+	})
+
+#define STORE_UNALIGNED_INT(type, p, v)	\
+	do { \
+		struct packed_struct { type __v; } __attribute__((packed)); \
+		((struct packed_struct *) (p))->__v = (v); \
+	} while (0)
+
+/*
+ * Copy from src into dest, assuming unaligned src and dest.
+ */
 static inline
 void lttng_inline_memcpy(void *dest, const void *src,
 		unsigned long len)
@@ -613,13 +623,13 @@ void lttng_inline_memcpy(void *dest, const void *src,
 		*(uint8_t *) dest = *(const uint8_t *) src;
 		break;
 	case 2:
-		*(uint16_t *) dest = *(const uint16_t *) src;
+		STORE_UNALIGNED_INT(uint16_t, dest, LOAD_UNALIGNED_INT(uint16_t, src));
 		break;
 	case 4:
-		*(uint32_t *) dest = *(const uint32_t *) src;
+		STORE_UNALIGNED_INT(uint32_t, dest, LOAD_UNALIGNED_INT(uint32_t, src));
 		break;
 	case 8:
-		*(uint64_t *) dest = *(const uint64_t *) src;
+		STORE_UNALIGNED_INT(uint64_t, dest, LOAD_UNALIGNED_INT(uint64_t, src));
 		break;
 	default:
 		inline_memcpy(dest, src, len);

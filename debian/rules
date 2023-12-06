@@ -27,6 +27,7 @@ EXTRA_CONF_OPTS += --enable-jni-interface \
 endif
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_PYTHON_INSTALL_LAYOUT = deb
 
 %:
 	dh $@ --with=python3 $(EXTRA_DH_OPTS)
@@ -45,3 +46,16 @@ override_dh_makeshlibs:
 override_jh_manifest:
 	jh_manifest -pliblttng-ust-agent-java
 endif
+
+override_dh_auto_test:
+# https://bugs.lttng.org/issues/1337
+# LP: #1953065
+ifeq ($(shell dpkg-buildflags --get LDFLAGS | grep -q -- '-Wl,-Bsymbolic-functions' && echo yes),yes)
+	dh_auto_test -- UST_TESTS_LD_SYMBOLIC_FUNC=1
+else
+	dh_auto_test
+endif
+
+execute_after_dh_auto_clean:
+	rm -f src/python-lttngust/installed_files.txt
+	rm -rf src/python-lttngust/lttngust.egg-info
