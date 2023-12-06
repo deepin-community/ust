@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: LGPL-2.1-only
  *
- * Copyright (C) 2011 David Goulet <david.goulet@polymtl.ca>
+ * Copyright (C) 2011 EfficiOS Inc.
  * Copyright (C) 2011 Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
  */
 
@@ -38,6 +38,7 @@
 #include <lttng/ust-thread.h>
 #include <lttng/ust-tracer.h>
 #include <lttng/ust-common.h>
+#include <lttng/ust-cancelstate.h>
 #include <urcu/tls-compat.h>
 #include "lib/lttng-ust/futex.h"
 #include "common/ustcomm.h"
@@ -118,6 +119,28 @@ static int lttng_ust_comm_should_quit;
 int lttng_ust_loaded __attribute__((weak));
 
 /*
+ * Notes on async-signal-safety of ust lock: a few libc functions are used
+ * which are not strictly async-signal-safe:
+ *
+ * - pthread_setcancelstate
+ * - pthread_mutex_lock
+ * - pthread_mutex_unlock
+ *
+ * As of glibc 2.35, the implementation of pthread_setcancelstate only
+ * touches TLS data, and it appears to be safe to use from signal
+ * handlers. If the libc implementation changes, this will need to be
+ * revisited, and we may ask glibc to provide an async-signal-safe
+ * pthread_setcancelstate.
+ *
+ * As of glibc 2.35, the implementation of pthread_mutex_lock/unlock
+ * for fast mutexes only relies on the pthread_mutex_t structure.
+ * Disabling signals around all uses of this mutex ensures
+ * signal-safety. If the libc implementation changes and eventually uses
+ * other global resources, this will need to be revisited and we may
+ * need to implement our own mutex.
+ */
+
+/*
  * Return 0 on success, -1 if should quit.
  * The lock is taken in both cases.
  * Signal-safe.
@@ -125,25 +148,21 @@ int lttng_ust_loaded __attribute__((weak));
 int ust_lock(void)
 {
 	sigset_t sig_all_blocked, orig_mask;
-	int ret, oldstate;
+	int ret;
 
-	ret = pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
-	if (ret) {
-		ERR("pthread_setcancelstate: %s", strerror(ret));
-	}
-	if (oldstate != PTHREAD_CANCEL_ENABLE) {
-		ERR("pthread_setcancelstate: unexpected oldstate");
+	if (lttng_ust_cancelstate_disable_push()) {
+		ERR("lttng_ust_cancelstate_disable_push");
 	}
 	sigfillset(&sig_all_blocked);
 	ret = pthread_sigmask(SIG_SETMASK, &sig_all_blocked, &orig_mask);
 	if (ret) {
-		ERR("pthread_sigmask: %s", strerror(ret));
+		ERR("pthread_sigmask: ret=%d", ret);
 	}
 	if (!URCU_TLS(ust_mutex_nest)++)
 		pthread_mutex_lock(&ust_mutex);
 	ret = pthread_sigmask(SIG_SETMASK, &orig_mask, NULL);
 	if (ret) {
-		ERR("pthread_sigmask: %s", strerror(ret));
+		ERR("pthread_sigmask: ret=%d", ret);
 	}
 	if (lttng_ust_comm_should_quit) {
 		return -1;
@@ -161,25 +180,21 @@ int ust_lock(void)
 void ust_lock_nocheck(void)
 {
 	sigset_t sig_all_blocked, orig_mask;
-	int ret, oldstate;
+	int ret;
 
-	ret = pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
-	if (ret) {
-		ERR("pthread_setcancelstate: %s", strerror(ret));
-	}
-	if (oldstate != PTHREAD_CANCEL_ENABLE) {
-		ERR("pthread_setcancelstate: unexpected oldstate");
+	if (lttng_ust_cancelstate_disable_push()) {
+		ERR("lttng_ust_cancelstate_disable_push");
 	}
 	sigfillset(&sig_all_blocked);
 	ret = pthread_sigmask(SIG_SETMASK, &sig_all_blocked, &orig_mask);
 	if (ret) {
-		ERR("pthread_sigmask: %s", strerror(ret));
+		ERR("pthread_sigmask: ret=%d", ret);
 	}
 	if (!URCU_TLS(ust_mutex_nest)++)
 		pthread_mutex_lock(&ust_mutex);
 	ret = pthread_sigmask(SIG_SETMASK, &orig_mask, NULL);
 	if (ret) {
-		ERR("pthread_sigmask: %s", strerror(ret));
+		ERR("pthread_sigmask: ret=%d", ret);
 	}
 }
 
@@ -189,25 +204,21 @@ void ust_lock_nocheck(void)
 void ust_unlock(void)
 {
 	sigset_t sig_all_blocked, orig_mask;
-	int ret, oldstate;
+	int ret;
 
 	sigfillset(&sig_all_blocked);
 	ret = pthread_sigmask(SIG_SETMASK, &sig_all_blocked, &orig_mask);
 	if (ret) {
-		ERR("pthread_sigmask: %s", strerror(ret));
+		ERR("pthread_sigmask: ret=%d", ret);
 	}
 	if (!--URCU_TLS(ust_mutex_nest))
 		pthread_mutex_unlock(&ust_mutex);
 	ret = pthread_sigmask(SIG_SETMASK, &orig_mask, NULL);
 	if (ret) {
-		ERR("pthread_sigmask: %s", strerror(ret));
+		ERR("pthread_sigmask: ret=%d", ret);
 	}
-	ret = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldstate);
-	if (ret) {
-		ERR("pthread_setcancelstate: %s", strerror(ret));
-	}
-	if (oldstate != PTHREAD_CANCEL_DISABLE) {
-		ERR("pthread_setcancelstate: unexpected oldstate");
+	if (lttng_ust_cancelstate_disable_pop()) {
+		ERR("lttng_ust_cancelstate_disable_pop");
 	}
 }
 
@@ -259,7 +270,7 @@ struct sock_info {
 	int statedump_pending;
 	int initial_statedump_done;
 	/* Keep procname for statedump */
-	char procname[LTTNG_UST_ABI_PROCNAME_LEN];
+	char procname[LTTNG_UST_CONTEXT_PROCNAME_LEN];
 };
 
 /* Socket from app (connect) to session daemon (listen) for communication */
@@ -378,13 +389,13 @@ const char *get_lttng_home_dir(void)
 static
 void lttng_nest_count_alloc_tls(void)
 {
-	asm volatile ("" : : "m" (URCU_TLS(lttng_ust_nest_count)));
+	__asm__ __volatile__ ("" : : "m" (URCU_TLS(lttng_ust_nest_count)));
 }
 
 static
 void lttng_ust_mutex_nest_alloc_tls(void)
 {
-	asm volatile ("" : : "m" (URCU_TLS(ust_mutex_nest)));
+	__asm__ __volatile__ ("" : : "m" (URCU_TLS(ust_mutex_nest)));
 }
 
 /*
@@ -482,7 +493,7 @@ int setup_global_apps(void)
 	}
 
 	global_apps.allowed = 1;
-	lttng_pthread_getname_np(global_apps.procname, LTTNG_UST_ABI_PROCNAME_LEN);
+	lttng_pthread_getname_np(global_apps.procname, LTTNG_UST_CONTEXT_PROCNAME_LEN);
 error:
 	return ret;
 }
@@ -528,7 +539,7 @@ int setup_local_apps(void)
 		goto end;
 	}
 
-	lttng_pthread_getname_np(local_apps.procname, LTTNG_UST_ABI_PROCNAME_LEN);
+	lttng_pthread_getname_np(local_apps.procname, LTTNG_UST_CONTEXT_PROCNAME_LEN);
 end:
 	return ret;
 }
@@ -1459,8 +1470,7 @@ void cleanup_sock_info(struct sock_info *sock_info, int exiting)
 		}
 		sock_info->root_handle = -1;
 	}
-	sock_info->registration_done = 0;
-	sock_info->initial_statedump_done = 0;
+
 
 	/*
 	 * wait_shm_mmap, socket and notify socket are used by listener
@@ -1471,6 +1481,9 @@ void cleanup_sock_info(struct sock_info *sock_info, int exiting)
 	 */
 	if (exiting)
 		return;
+
+	sock_info->registration_done = 0;
+	sock_info->initial_statedump_done = 0;
 
 	if (sock_info->socket != -1) {
 		ret = ustcomm_close_unix_sock(sock_info->socket);
@@ -1569,14 +1582,14 @@ open_write:
 	pid = fork();
 	URCU_TLS(lttng_ust_nest_count)--;
 	if (pid > 0) {
-		int status;
+		int status, wait_ret;
 
 		/*
 		 * Parent: wait for child to return, in which case the
 		 * shared memory map will have been created.
 		 */
-		pid = wait(&status);
-		if (pid < 0 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+		wait_ret = waitpid(pid, &status, 0);
+		if (wait_ret < 0 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
 			wait_shm_fd = -1;
 			goto end;
 		}
@@ -1744,18 +1757,25 @@ void wait_for_sessiond(struct sock_info *sock_info)
 
 	DBG("Waiting for %s apps sessiond", sock_info->name);
 	/* Wait for futex wakeup */
-	if (uatomic_read((int32_t *) sock_info->wait_shm_mmap))
-		goto end_wait;
-
-	while (lttng_ust_futex_async((int32_t *) sock_info->wait_shm_mmap,
-			FUTEX_WAIT, 0, NULL, NULL, 0)) {
+	while (!uatomic_read((int32_t *) sock_info->wait_shm_mmap)) {
+		if (!lttng_ust_futex_async((int32_t *) sock_info->wait_shm_mmap, FUTEX_WAIT, 0, NULL, NULL, 0)) {
+			/*
+			 * Prior queued wakeups queued by unrelated code
+			 * using the same address can cause futex wait to
+			 * return 0 even through the futex value is still
+			 * 0 (spurious wakeups). Check the value again
+			 * in user-space to validate whether it really
+			 * differs from 0.
+			 */
+			continue;
+		}
 		switch (errno) {
-		case EWOULDBLOCK:
+		case EAGAIN:
 			/* Value already changed. */
 			goto end_wait;
 		case EINTR:
 			/* Retry if interrupted by signal. */
-			break;	/* Get out of switch. */
+			break;	/* Get out of switch. Check again. */
 		case EFAULT:
 			wait_poll_fallback = 1;
 			DBG(

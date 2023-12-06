@@ -1,4 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: lttng-ust
+Upstream-Contact: https://lists.lttng.org/cgi-bin/mailman/listinfo/lttng-dev
 
 Files: *
 Copyright: 2009-2012, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
@@ -11,7 +13,7 @@ License: LGPL-2.1
 Files: debian/*
 Copyright: 2011-2013, Alexandre Montplaisir <alexmonthy@voxpopuli.im>
            2010-2013, Jon Bernard <jbernard@debian.org>
-           2015-2019, Michael Jeanson <mjeanson@debian.org>
+           2015-2022, Michael Jeanson <mjeanson@debian.org>
 License: GPL-3
 
 Files: doc/*
@@ -106,8 +108,20 @@ Files: doc/examples/java-jul/Hello.java
 Copyright: 2015, - EfficiOS Inc., Alexandre Montplaisir <alexmonthy@efficios.com> / 2013, - David Goulet <dgoulet@efficios.com>
 License: Expat
 
-Files: doc/examples/java-log4j/Hello.java
+Files: doc/examples/java-log4j/HelloLog4j.java
 Copyright: 2015, - EfficiOS Inc., Alexandre Montplaisir <alexmonthy@efficios.com> / 2014, - Christian Babeux <christian.babeux@efficios.com>
+License: Expat
+
+Files: doc/examples/java-log4j2-basic/HelloLog4j2.java
+Copyright: 2022, EfficiOS Inc.
+License: Expat
+
+Files: doc/examples/java-log4j2-ctx/HelloLog4j2Ctx.java
+Copyright: 2022, EfficiOS Inc.
+License: Expat
+
+Files: doc/examples/java-log4j2-prog/HelloLog4j2Prog.java
+Copyright: 2022, EfficiOS Inc.
 License: Expat
 
 Files: include/*
@@ -322,6 +336,17 @@ License: LGPL-2.1
 
 Files: src/lib/lttng-ust-java-agent/java/lttng-ust-agent-log4j/org/lttng/ust/agent/log4j/LttngLogAppender.java
 Copyright: 2015, - EfficiOS Inc., Alexandre Montplaisir <alexmonthy@efficios.com> / 2014, - Christian Babeux <christian.babeux@efficios.com>
+License: LGPL-2.1
+
+Files: src/lib/lttng-ust-java-agent/java/lttng-ust-agent-log4j2/*
+Copyright: 2015-2022, EfficiOS Inc.
+  2015, 2016, Alexandre Montplaisir <alexmonthy@efficios.com>
+License: LGPL-2.1
+
+Files: src/lib/lttng-ust-java-agent/java/lttng-ust-agent-log4j2/org/lttng/ust/agent/log4j2/LttngLogAppender.java
+Copyright: 2015-2022, EfficiOS Inc.
+  2015, Alexandre Montplaisir <alexmonthy@efficios.com>
+  2014, Christian Babeux <christian.babeux@efficios.com>
 License: LGPL-2.1
 
 Files: src/lib/lttng-ust-java-agent/jni/common/*

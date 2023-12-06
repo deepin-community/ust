@@ -1,8 +1,77 @@
-ust (2.13.0-deepin1) unstable; urgency=medium
+ust (2.13.6-3) unstable; urgency=medium
 
-  * Rebuild
+  [ Michael Jeanson ]
+  * [33be613] Add lintian override for JNI RUNPATH
 
- -- Deepin Packages Builder <packages@deepin.org>  Mon, 14 Nov 2022 17:49:17 +0800
+  [ Andreas Hasenack ]
+  * [4202827] Adjust test if -Wl,-Bsymbolic-functions is used
+
+  [ Michael Jeanson ]
+  * [bd6978f] Update salsa-ci config
+  * [98d9799] Fix salsa-ci.yaml syntax
+  * [6709a6a] Fix clean target (Closes: #1047714)
+
+ -- Michael Jeanson <mjeanson@debian.org>  Tue, 17 Oct 2023 16:08:22 -0400
+
+ust (2.13.6-2) unstable; urgency=medium
+
+  * [ec5d2be] Set python install layout to 'deb'
+
+ -- Michael Jeanson <mjeanson@debian.org>  Tue, 13 Jun 2023 14:42:45 -0400
+
+ust (2.13.6-1) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * [1bbb9e3] Set fields Upstream-Name, Upstream-Contact in debian/copyright.
+  * [2002ca8] Set upstream metadata fields: Bug-Submit (from ./configure).
+  * [9b6ee2f] Remove obsolete fields Contact, Name from
+    debian/upstream/metadata (already present in machine-readable
+    debian/copyright).
+  * [2e13d21] Remove constraints unnecessary since buster (oldstable)
+
+  [ Michael Jeanson ]
+  * [ed95f59] New upstream version 2.13.6
+
+ -- Michael Jeanson <mjeanson@debian.org>  Tue, 13 Jun 2023 14:18:25 -0400
+
+ust (2.13.5-1) unstable; urgency=medium
+
+  * [cfba21e] New upstream version 2.13.5
+  * [d010dfc] Mark LTO optional symbols (Closes: #1015698)
+  * [f3bb02e] Disable java on hppa (Closes: #1010875)
+  * [5e3f226] Refresh jni libdir patch
+
+ -- Michael Jeanson <mjeanson@debian.org>  Tue, 11 Oct 2022 10:40:04 -0400
+
+ust (2.13.4-1) unstable; urgency=medium
+
+  * [99d1f58] New upstream version 2.13.4
+  * [cfbad03] Update source lintian overrides
+  * [7f34a28] Update debian copyright
+  * [5690f4a] Bump standards version to 4.6.1.0
+
+ -- Michael Jeanson <mjeanson@debian.org>  Tue, 23 Aug 2022 14:44:23 -0400
+
+ust (2.13.3-1) unstable; urgency=medium
+
+  * [92abdd1] New upstream version 2.13.3
+
+ -- Michael Jeanson <mjeanson@debian.org>  Fri, 03 Jun 2022 16:37:11 -0400
+
+ust (2.13.2-1) unstable; urgency=medium
+
+  * [52c4ecd] New upstream version 2.13.2
+  * [1e10379] Refresh patches
+  * [4e70775] Update debian/copyright
+
+ -- Michael Jeanson <mjeanson@debian.org>  Mon, 28 Mar 2022 17:09:53 -0400
+
+ust (2.13.1-1) unstable; urgency=medium
+
+  * [fb6e972] New upstream version 2.13.1
+  * [13ccf7e] Update symbols for 2.13.1
+
+ -- Michael Jeanson <mjeanson@debian.org>  Fri, 10 Dec 2021 16:28:57 -0500
 
 ust (2.13.0-3) unstable; urgency=medium
 
