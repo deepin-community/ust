@@ -9,9 +9,9 @@ Build-Depends: debhelper-compat (= 12),
   liblog4j1.2-java [!hppa] <!nojava>,
   libnuma-dev,
   liburcu-dev (>= 0.12~),
-  pkg-config,
+  pkgconf,
   python3-all,
-  python3-distutils,
+  python3-setuptools,
   texinfo,
   uuid-dev
 Standards-Version: 4.6.1.0
